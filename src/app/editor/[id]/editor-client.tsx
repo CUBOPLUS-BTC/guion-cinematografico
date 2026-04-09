@@ -269,14 +269,9 @@ export function EditorClient({
           <EditorLayout
             chatSlot={
               <ChatPanel
-                synopsisSlot={
-                  <SynopsisPanel
-                    projectId={projectId}
-                    model="openai/gpt-oss-20b:free"
-                    initialLogline={initialLogline}
-                    initialSynopsis={initialSynopsis}
-                  />
-                }
+                projectId={projectId}
+                initialLogline={initialLogline}
+                initialSynopsis={initialSynopsis}
               />
             }
             previewSlot={<PreviewPanel />}

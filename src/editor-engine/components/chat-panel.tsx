@@ -23,15 +23,18 @@ import {
   RefreshCw,
 } from "lucide-react"
 import type { ModelInfo } from "@/app/api/models/route"
+import { SynopsisPanel } from "@/editor-engine/components/synopsis-panel"
 
 export const DEFAULT_MODEL = "openai/gpt-oss-20b:free"
 
 export type ChatPanelProps = {
   compact?: boolean
-  synopsisSlot?: ReactNode
+  projectId?: string
+  initialLogline?: string
+  initialSynopsis?: string
 }
 
-export function ChatPanel({ compact, synopsisSlot }: ChatPanelProps) {
+export function ChatPanel({ compact, projectId, initialLogline = "", initialSynopsis = "" }: ChatPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollAnchorRef = useRef<HTMLDivElement>(null)
   const { messages, busy, runQuickAction, submitChat, stop, setModel, apiError, clearApiError } = useEditorChat()
@@ -101,9 +104,14 @@ export function ChatPanel({ compact, synopsisSlot }: ChatPanelProps) {
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
       <ScrollArea className="flex-1 min-h-0">
         <div className={`${padX} py-4 ${maxW} space-y-4`}>
-          {synopsisSlot && (
+          {projectId && (
             <div className="pt-1">
-              {synopsisSlot}
+              <SynopsisPanel
+                projectId={projectId}
+                model={selectedModel}
+                initialLogline={initialLogline}
+                initialSynopsis={initialSynopsis}
+              />
             </div>
           )}
 

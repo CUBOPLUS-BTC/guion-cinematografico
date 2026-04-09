@@ -52,7 +52,7 @@ ${fountain.slice(0, 4000)}`
       model: openrouter(modelId),
       prompt,
       temperature: 0.7,
-      maxTokens: 500,
+      maxOutputTokens: 500,
     })
 
     // Parsear JSON de la respuesta
