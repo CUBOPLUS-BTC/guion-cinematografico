@@ -7,12 +7,19 @@ import {
 } from "@/components/ui/resizable"
 import { EditorCanvas } from "@/editor-engine/components/editor-canvas"
 import { AICommandMenu } from "@/editor-engine/components/ai-command-menu"
+import { PluginsPanel } from "@/editor-engine/components/plugins-panel"
 import { useUIStore } from "@/editor-engine/store/ui-store"
 import { useEditorStore } from "@/editor-engine/store/editor-store"
+import { useEffect } from "react"
+import { initializePlugins } from "@/editor-engine/plugins/all-plugins"
 
 export default function EditorPage({ params }: { params: { id: string } }) {
   const { outlineOpen, pluginsOpen } = useUIStore()
   const { stats } = useEditorStore()
+
+  useEffect(() => {
+    initializePlugins()
+  }, [])
 
   return (
     <div className="h-screen w-full flex flex-col bg-bg-primary overflow-hidden">
@@ -65,19 +72,8 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           {pluginsOpen && (
             <>
               <ResizableHandle withHandle className="bg-accent-muted" />
-              <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="bg-bg-secondary">
-                <div className="p-0 flex flex-col h-full">
-                  <div className="p-4 border-b border-accent-muted">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-text-muted">Plugins de Direccion</h3>
-                  </div>
-                  <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                    {/* Placeholder for plugins */}
-                    <div className="space-y-2">
-                       <label className="text-xs font-medium text-text-secondary">Planos Cinematográficos</label>
-                       <div className="h-10 border border-accent-muted rounded bg-bg-tertiary flex items-center px-3 text-sm text-text-muted italic">Seleccionar plano...</div>
-                    </div>
-                  </div>
-                </div>
+              <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+                <PluginsPanel />
               </ResizablePanel>
             </>
           )}

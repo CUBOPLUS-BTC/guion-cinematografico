@@ -3,10 +3,12 @@ import { useEditorStore } from '../store/editor-store';
 import { useProjectStore } from '../store/project-store';
 import { AIRequest } from '@/lib/core/ai/orchestrator';
 import { convertTipTapToFountain } from '@/lib/core/fountain/convert-tiptap';
+import { usePluginStore } from '../store/plugin-store';
 
 export const useAIGenerator = () => {
   const { editor, markDirty } = useEditorStore();
   const project = useProjectStore();
+  const { getAIModifiers } = usePluginStore();
 
   const { complete, completion, isLoading } = useCompletion({
     api: '/api/ai/generate',
@@ -36,7 +38,7 @@ export const useAIGenerator = () => {
         currentScene: null,
         characters: [], // Aquí podríamos extraer personajes únicos del script
       },
-      modifiers: {},
+      modifiers: { technical: getAIModifiers() },
       userInstruction,
       model: 'anthropic/claude-3-haiku',
     };
