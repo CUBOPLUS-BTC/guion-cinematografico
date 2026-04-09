@@ -52,33 +52,33 @@ function blockIcon(block: FountainBlock) {
 function blockShellClass(block: FountainBlock): string {
   const { type, semanticTag } = block
   if (semanticTag === "scenography")
-    return "border-l-4 border-emerald-500/70 bg-emerald-500/5 dark:bg-emerald-500/10"
+    return "bg-emerald-500/5 dark:bg-emerald-500/10"
   if (semanticTag === "sound")
-    return "border-l-4 border-sky-500/70 bg-sky-500/5 dark:bg-sky-500/10"
+    return "bg-sky-500/5 dark:bg-sky-500/10"
   if (semanticTag === "music")
-    return "border-l-4 border-violet-500/70 bg-violet-500/5 dark:bg-violet-500/10"
+    return "bg-violet-500/5 dark:bg-violet-500/10"
   if (semanticTag === "camera")
-    return "border-l-4 border-fuchsia-500/70 bg-fuchsia-500/5 dark:bg-fuchsia-500/10"
+    return "bg-fuchsia-500/5 dark:bg-fuchsia-500/10"
   if (semanticTag === "time")
-    return "border-l-4 border-amber-500/70 bg-amber-500/5 dark:bg-amber-500/10"
+    return "bg-amber-500/5 dark:bg-amber-500/10"
 
   switch (type) {
     case "scene_heading":
-      return "border-l-4 border-[var(--fountain-scene)] bg-[var(--fountain-scene)]/8"
+      return "bg-[var(--fountain-scene)]/8"
     case "character":
-      return "border-l-4 border-[var(--fountain-character)] bg-[var(--fountain-character)]/6"
+      return "bg-[var(--fountain-character)]/6"
     case "dialogue":
       return "pl-8 md:pl-16 border-l border-accent-muted/40"
     case "parenthetical":
       return "pl-10 md:pl-20 italic text-text-muted text-sm"
     case "transition":
-      return "text-right uppercase tracking-wide text-sm border-l-4 border-[var(--fountain-transition)]"
+      return "text-right uppercase tracking-wide text-sm"
     case "section":
       return "mt-6 mb-2 pt-4 border-t border-accent-muted text-lg font-bold text-accent"
     case "centered":
       return "text-center"
     case "note":
-      return "border-l-4 border-[var(--fountain-note)] bg-[var(--fountain-note)]/8 text-sm"
+      return "bg-[var(--fountain-note)]/8 text-sm"
     default:
       return "border-l border-transparent"
   }
