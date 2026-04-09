@@ -8,6 +8,8 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
+  useState,
   type ReactNode,
 } from "react"
 import { useChatStore } from "@/editor-engine/store/chat-store"
@@ -35,6 +37,7 @@ export type EditorChatContextValue = {
   busy: boolean
   runQuickAction: (action: Exclude<ChatDocumentAction, "chat">) => Promise<void>
   submitChat: (text: string) => Promise<void>
+  setModel: (model: string) => void
 }
 
 const EditorChatContext = createContext<EditorChatContextValue | null>(null)
@@ -53,6 +56,8 @@ export function ChatProvider({
   const setPendingAction = useChatStore((s) => s.setPendingAction)
   const documentFountain = useChatStore((s) => s.documentFountain)
   const updateStatsFromFountain = useEditorStore((s) => s.updateStatsFromFountain)
+  const [activeModel, setActiveModel] = useState<string>("meta-llama/llama-3.1-8b-instruct:free")
+  const activeModelRef = useRef(activeModel)
 
   const transport = useMemo(
     () =>
@@ -65,7 +70,7 @@ export function ChatProvider({
             messages,
             documentFountain: useChatStore.getState().documentFountain,
             modifiers: { technical: usePluginStore.getState().getAIModifiers() },
-            model: "anthropic/claude-3-haiku",
+            model: activeModelRef.current,
             action: useChatStore.getState().pendingAction,
           },
         }),
@@ -84,6 +89,10 @@ export function ChatProvider({
       useChatStore.getState().setPendingAction("chat")
     },
   })
+
+  useEffect(() => {
+    activeModelRef.current = activeModel
+  }, [activeModel])
 
   useEffect(() => {
     updateStatsFromFountain(documentFountain)
@@ -110,6 +119,10 @@ export function ChatProvider({
     [busy, sendMessage, setPendingAction]
   )
 
+  const setModel = useCallback((model: string) => {
+    setActiveModel(model)
+  }, [])
+
   const value = useMemo<EditorChatContextValue>(
     () => ({
       projectId,
@@ -120,6 +133,7 @@ export function ChatProvider({
       busy,
       runQuickAction,
       submitChat,
+      setModel,
     }),
     [
       projectId,
@@ -130,6 +144,7 @@ export function ChatProvider({
       busy,
       runQuickAction,
       submitChat,
+      setModel,
     ]
   )
 
