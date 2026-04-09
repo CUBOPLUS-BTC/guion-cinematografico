@@ -12,14 +12,28 @@ import { useUIStore } from "@/editor-engine/store/ui-store"
 import { useEditorStore } from "@/editor-engine/store/editor-store"
 import { useEffect } from "react"
 import { initializePlugins } from "@/editor-engine/plugins/all-plugins"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu"
+import { Download, FileText, Share2 } from "lucide-react"
 
 export default function EditorPage({ params }: { params: { id: string } }) {
   const { outlineOpen, pluginsOpen } = useUIStore()
-  const { stats } = useEditorStore()
+  const { stats, isDirty } = useEditorStore()
 
   useEffect(() => {
     initializePlugins()
   }, [])
+
+  const handleExport = (format: 'pdf' | 'fdx') => {
+    window.open(`/api/projects/${params.id}/export?format=${format}`, '_blank')
+  }
 
   return (
     <div className="h-screen w-full flex flex-col bg-bg-primary overflow-hidden">
@@ -27,26 +41,49 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       {/* Top Toolbar */}
       <header className="h-12 border-b border-accent-muted bg-bg-secondary flex items-center px-4 justify-between">
         <div className="flex items-center gap-4 text-sm">
-          <span className="font-bold text-accent">Proyecto #{params.id}</span>
-          <div className="h-4 w-px bg-accent-muted"></div>
-          <span className="text-text-secondary">
-            {stats.wordCount} palabras | {stats.sceneCount} escenas
-          </span>
+          <Link href="/dashboard" className="text-accent font-bold hover:underline">← DASHBOARD</Link>
+          <div className="h-4 w-px bg-accent-muted" />
+          <h2 className="font-medium text-text-primary">Proyecto: {params.id === 'new' ? 'Nuevo Guion' : params.id}</h2>
+          <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-text-muted ml-4">
+            <div className={`size-1.5 rounded-full ${isDirty ? 'bg-amber-500 animate-pulse' : 'bg-green-500'}`} />
+            <span>{isDirty ? 'Guardando...' : 'Sincronizado'}</span>
+          </div>
         </div>
+
         <div className="flex items-center gap-2">
-          {/* AI and Export buttons */}
-          <div className="px-3 py-1 rounded bg-accent text-bg-primary text-xs font-bold cursor-pointer hover:bg-accent-hover transition-colors">
-            Generar IA
+          <div className="flex items-center gap-4 mr-4 text-[10px] text-text-muted uppercase font-bold tracking-widest">
+            <span>{stats.wordCount} Palabras</span>
+            <span>{stats.sceneCount} Escenas</span>
           </div>
-          <div className="px-3 py-1 rounded border border-accent-muted text-accent text-xs font-bold cursor-pointer hover:bg-bg-tertiary transition-colors">
-            Exportar
-          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 border-accent-muted text-xs gap-2">
+                <Download className="h-3 w-3" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-bg-secondary border-accent-muted">
+              <DropdownMenuItem onClick={() => handleExport('pdf')} className="text-xs flex items-center gap-2">
+                <FileText className="h-3 w-3" />
+                PDF Profesional (.pdf)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('fdx')} className="text-xs flex items-center gap-2">
+                <Share2 className="h-3 w-3" />
+                Final Draft (.fdx)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button size="sm" className="h-8 bg-accent text-white text-xs px-4">
+            Compartir
+          </Button>
         </div>
       </header>
 
       {/* Main Resizable Area */}
       <div className="flex-1">
-        <ResizablePanelGroup direction="horizontal">
+        <ResizablePanelGroup direction={"horizontal" as any}>
           {/* Left Panel: Outline */}
           {outlineOpen && (
             <>
