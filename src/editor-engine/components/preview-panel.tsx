@@ -61,11 +61,6 @@ export function PreviewPanel() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
-      <div className="shrink-0 px-4 pt-4 md:px-8 max-w-4xl mx-auto w-full">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-          Guion (edición por bloques)
-        </p>
-      </div>
       <ScreenplayBlockEditor disabled={false} />
       <div ref={scrollAnchorRef} className="h-px shrink-0" aria-hidden />
     </div>

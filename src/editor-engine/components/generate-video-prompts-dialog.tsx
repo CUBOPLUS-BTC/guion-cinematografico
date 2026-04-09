@@ -139,7 +139,7 @@ export function GenerateVideoPromptsDialog({
         <DialogHeader className="shrink-0 border-b border-accent-muted/80 bg-bg-secondary px-6 pt-6 pb-4">
           <DialogTitle className="text-text-primary flex items-center gap-2">
             <Clapperboard className="h-5 w-5 text-accent" />
-            Prompts para video (IA externa)
+            Prompts para video
           </DialogTitle>
           <DialogDescription className="text-text-muted text-sm">
             Prompts secuenciales listos para pegar en herramientas de generación de
