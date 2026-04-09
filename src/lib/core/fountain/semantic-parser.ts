@@ -56,9 +56,61 @@ const CHARACTER_REGEX = /^[A-Z0-9\s\(\)\d]+(\s\^)?$/
 const PARENTHETICAL_REGEX = /^\(.*\)$/
 
 /**
+ * Sanitiza texto que puede venir con etiquetas no-Fountain como [ACCIÓN], [ENCABEZADO], etc.
+ * Convierte al Fountain equivalente para que el parser lo entienda correctamente.
+ */
+export function sanitizeFountainInput(input: string): string {
+  const lines = input.split(/\r?\n/)
+  const out: string[] = []
+
+  for (const raw of lines) {
+    const line = raw.trim()
+
+    // Eliminar líneas que son solo etiquetas de bloque sin contenido útil
+    if (/^\[(ACCIÓN|ACCION|ACTION|TRANSICIÓN|TRANSICION|TRANSITION|ENCABEZADO|HEADING)\]$/.test(line)) {
+      continue
+    }
+
+    // [PERSONAJE] NombrePersonaje → NombrePersonaje (en mayúsculas, Fountain lo detecta como character)
+    const charMatch = line.match(/^\[PERSONAJE\]\s*(.+)$/i)
+    if (charMatch) {
+      out.push(charMatch[1].trim().toUpperCase())
+      continue
+    }
+
+    // [DIÁLOGO] texto → texto plano (siguiente línea tras personaje = dialogue)
+    const dialogMatch = line.match(/^\[DI[ÁA]LOGO\]\s*(.*)$/i)
+    if (dialogMatch) {
+      out.push(dialogMatch[1].trim())
+      continue
+    }
+
+    // [ACOTACIÓN] texto → (texto) parenthetical
+    const parenMatch = line.match(/^\[ACOTACI[ÓO]N\]\s*(.*)$/i)
+    if (parenMatch) {
+      const t = parenMatch[1].trim()
+      out.push(t.startsWith("(") ? t : `(${t})`)
+      continue
+    }
+
+    // Líneas con sufijo [ENCABEZADO], [ACCIÓN], etc. al final — limpiar el sufijo
+    const cleaned = line
+      .replace(/\s*\[(ACCIÓN|ACCION|ACTION|ENCABEZADO|HEADING|TRANSICIÓN|TRANSICION)\]\s*$/i, "")
+      .trim()
+
+    if (cleaned.length > 0) {
+      out.push(cleaned)
+    }
+  }
+
+  return out.join("\n")
+}
+
+/**
  * Parsea un guion Fountain en bloques con etiquetas semánticas para el editor.
  */
 export function parseFountainToBlocks(fountain: string): FountainBlock[] {
+  fountain = sanitizeFountainInput(fountain)
   resetBlockIdCounter()
   const lines = fountain.split(/\r?\n/)
   const blocks: FountainBlock[] = []
