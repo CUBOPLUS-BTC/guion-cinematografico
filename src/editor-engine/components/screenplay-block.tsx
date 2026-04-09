@@ -11,13 +11,122 @@ export type ScreenplayBlockProps = {
   disabled?: boolean
 }
 
-const SEMANTIC_COLORS: Record<string, { bg: string; bar: string; label: string; labelColor: string }> = {
-  scenography: { bg: "bg-emerald-50 dark:bg-emerald-950/30 border-l-2 border-emerald-400", bar: "", label: "🏛 Escenografía", labelColor: "text-emerald-600 dark:text-emerald-400" },
-  sound:       { bg: "bg-sky-50 dark:bg-sky-950/30 border-l-2 border-sky-400",             bar: "", label: "🎙 Sonido",        labelColor: "text-sky-600 dark:text-sky-400" },
-  music:       { bg: "bg-violet-50 dark:bg-violet-950/30 border-l-2 border-violet-400",   bar: "", label: "🎵 Música",        labelColor: "text-violet-600 dark:text-violet-400" },
-  camera:      { bg: "bg-fuchsia-50 dark:bg-fuchsia-950/30 border-l-2 border-fuchsia-400",bar: "", label: "🎬 Cámara",        labelColor: "text-fuchsia-600 dark:text-fuchsia-400" },
-  time:        { bg: "bg-amber-50 dark:bg-amber-950/30 border-l-2 border-amber-400",      bar: "", label: "⏱ Tiempo",         labelColor: "text-amber-600 dark:text-amber-400" },
+// ── Configuración visual por tipo/tag ──────────────────────────────────────
+
+interface BlockConfig {
+  label: string
+  labelColor: string
+  leftBorder: string
+  bg: string
+  textClass: string
+  indent?: string
+  fullWidth?: boolean
 }
+
+function getBlockConfig(block: FountainBlock): BlockConfig {
+  // Etiquetas semánticas de producción
+  if (block.semanticTag === "scenography") return {
+    label: "🏛 ESCENOGRAFÍA",
+    labelColor: "text-emerald-600 dark:text-emerald-400",
+    leftBorder: "border-l-[3px] border-emerald-400",
+    bg: "bg-emerald-50/80 dark:bg-emerald-950/25",
+    textClass: "text-sm text-emerald-900 dark:text-emerald-100",
+  }
+  if (block.semanticTag === "camera") return {
+    label: "🎬 CÁMARA",
+    labelColor: "text-fuchsia-600 dark:text-fuchsia-400",
+    leftBorder: "border-l-[3px] border-fuchsia-400",
+    bg: "bg-fuchsia-50/80 dark:bg-fuchsia-950/25",
+    textClass: "text-sm text-fuchsia-900 dark:text-fuchsia-100",
+  }
+  if (block.semanticTag === "sound") return {
+    label: "🎙 SONIDO",
+    labelColor: "text-sky-600 dark:text-sky-400",
+    leftBorder: "border-l-[3px] border-sky-400",
+    bg: "bg-sky-50/80 dark:bg-sky-950/25",
+    textClass: "text-sm text-sky-900 dark:text-sky-100",
+  }
+  if (block.semanticTag === "music") return {
+    label: "🎵 MÚSICA",
+    labelColor: "text-violet-600 dark:text-violet-400",
+    leftBorder: "border-l-[3px] border-violet-400",
+    bg: "bg-violet-50/80 dark:bg-violet-950/25",
+    textClass: "text-sm text-violet-900 dark:text-violet-100",
+  }
+  if (block.semanticTag === "time") return {
+    label: "⏱ TIMING",
+    labelColor: "text-amber-600 dark:text-amber-400",
+    leftBorder: "border-l-[3px] border-amber-400",
+    bg: "bg-amber-50/80 dark:bg-amber-950/25",
+    textClass: "text-xs font-mono text-amber-800 dark:text-amber-300",
+  }
+
+  // Tipos estructurales
+  switch (block.type) {
+    case "scene_heading": return {
+      label: "📍 ESCENA",
+      labelColor: "text-blue-600 dark:text-blue-400",
+      leftBorder: "border-l-[4px] border-blue-500",
+      bg: "bg-blue-50/60 dark:bg-blue-950/20",
+      textClass: "font-bold uppercase tracking-widest text-sm text-blue-800 dark:text-blue-200",
+    }
+    case "character": return {
+      label: "👤 PERSONAJE",
+      labelColor: "text-orange-500 dark:text-orange-400",
+      leftBorder: "",
+      bg: "",
+      textClass: "font-bold uppercase tracking-widest text-sm text-orange-700 dark:text-orange-300 text-center",
+      fullWidth: true,
+    }
+    case "dialogue": return {
+      label: "💬 DIÁLOGO",
+      labelColor: "text-gray-400 dark:text-gray-500",
+      leftBorder: "border-l-[2px] border-gray-200 dark:border-gray-700",
+      bg: "",
+      textClass: "text-sm text-gray-800 dark:text-gray-200",
+      indent: "pl-10 md:pl-16",
+    }
+    case "parenthetical": return {
+      label: "( acotación )",
+      labelColor: "text-gray-400 dark:text-gray-500",
+      leftBorder: "",
+      bg: "",
+      textClass: "text-xs italic text-gray-500 dark:text-gray-400 text-center",
+      fullWidth: true,
+    }
+    case "transition": return {
+      label: "➡ TRANSICIÓN",
+      labelColor: "text-gray-400 dark:text-gray-500",
+      leftBorder: "",
+      bg: "",
+      textClass: "text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right",
+      fullWidth: true,
+    }
+    case "section": return {
+      label: "📋 SECCIÓN",
+      labelColor: "text-accent",
+      leftBorder: "border-l-[3px] border-accent",
+      bg: "bg-accent/5",
+      textClass: "font-black uppercase tracking-widest text-base text-accent",
+    }
+    case "note": return {
+      label: "📝 NOTA",
+      labelColor: "text-yellow-600 dark:text-yellow-400",
+      leftBorder: "border-l-[2px] border-yellow-400",
+      bg: "bg-yellow-50/60 dark:bg-yellow-950/20",
+      textClass: "text-xs font-mono text-yellow-700 dark:text-yellow-300",
+    }
+    default: return {
+      label: "✏ ACCIÓN",
+      labelColor: "text-gray-400 dark:text-gray-500",
+      leftBorder: "",
+      bg: "",
+      textClass: "text-sm text-gray-800 dark:text-gray-200 leading-relaxed",
+    }
+  }
+}
+
+// ── Componente ──────────────────────────────────────────────────────────────
 
 export function ScreenplayBlock({ block, onCommit, onDelete, disabled }: ScreenplayBlockProps) {
   const [value, setValue] = useState(block.text)
@@ -29,115 +138,95 @@ export function ScreenplayBlock({ block, onCommit, onDelete, disabled }: Screenp
     const el = ta.current
     if (!el) return
     el.style.height = "auto"
-    el.style.height = `${Math.max(el.scrollHeight, 24)}px`
+    el.style.height = `${Math.max(el.scrollHeight, 20)}px`
   }, [])
 
   useEffect(() => { adjustHeight() }, [value, adjustHeight])
 
-  const semantic = block.semanticTag !== "none" ? SEMANTIC_COLORS[block.semanticTag] : null
-  const isScene  = block.type === "scene_heading"
-  const isChar   = block.type === "character"
-  const isDial   = block.type === "dialogue"
-  const isParen  = block.type === "parenthetical"
-  const isTrans  = block.type === "transition"
-  const isSection = block.type === "section"
-  const isNote   = block.type === "note"
-
-  // ── Layout wrapper classes ───────────────────────────────────────────────
-  const wrapClass = cn(
-    "w-full transition-colors group",
-    // Scene heading — standout
-    isScene   && "my-5 py-2 px-4 bg-gradient-to-r from-blue-600/10 to-transparent border-l-4 border-blue-500 rounded-r-md",
-    // Semantic production blocks
-    semantic  && cn("my-1.5 py-2 px-3 rounded-md", semantic.bg),
-    // Character — centered block
-    isChar    && "my-3 flex justify-center",
-    // Dialogue — indent
-    isDial    && "my-0.5 px-8 md:px-20",
-    // Parenthetical — indent more
-    isParen   && "my-0 px-10 md:px-24",
-    // Transition
-    isTrans   && "my-4 px-4",
-    // Section / Act
-    isSection && "my-6 py-3 px-4 border-b-2 border-accent",
-    // Note / timing
-    isNote    && "my-1 px-3 py-1 rounded bg-amber-50 dark:bg-amber-950/20",
-    // Default action
-    !isScene && !semantic && !isChar && !isDial && !isParen && !isTrans && !isSection && !isNote
-      && "my-1 px-4"
-  )
-
-  // ── Textarea classes ─────────────────────────────────────────────────────
-  const taClass = cn(
-    "w-full resize-none bg-transparent outline-none leading-relaxed",
-    "focus-visible:ring-0",
-    disabled && "cursor-not-allowed opacity-60",
-
-    // Scene heading
-    isScene   && "font-bold uppercase tracking-widest text-sm text-blue-700 dark:text-blue-300",
-
-    // Character name
-    isChar    && "font-bold uppercase tracking-widest text-sm text-orange-700 dark:text-orange-300 text-center w-auto min-w-[120px]",
-
-    // Dialogue
-    isDial    && "font-mono text-sm text-text-primary leading-relaxed",
-
-    // Parenthetical
-    isParen   && "text-sm italic text-text-muted",
-
-    // Transition
-    isTrans   && "text-sm uppercase font-semibold text-right text-text-muted tracking-wider",
-
-    // Section / Act
-    isSection && "text-base font-black uppercase tracking-widest text-accent",
-
-    // Note / time
-    isNote    && "text-xs text-amber-700 dark:text-amber-400 font-mono",
-
-    // Semantic blocks
-    semantic  && "text-sm text-text-secondary",
-
-    // Plain action
-    !isScene && !isChar && !isDial && !isParen && !isTrans && !isSection && !isNote && !semantic
-      && "text-sm text-text-primary",
-  )
+  const cfg = getBlockConfig(block)
+  const isCharOrTrans = block.type === "character" || block.type === "transition" || block.type === "parenthetical"
 
   return (
-    <div className={wrapClass}>
-      {/* Semantic label badge */}
-      {semantic && (
-        <p className={cn("text-[9px] font-bold uppercase tracking-widest mb-1", semantic.labelColor)}>
-          {semantic.label}
-        </p>
+    <div className={cn(
+      "group relative flex items-start gap-0 transition-colors",
+      block.type === "scene_heading" && "mt-6 mb-1",
+      block.type === "character" && "mt-4 mb-0 justify-center",
+      block.type === "dialogue" && "mb-0",
+      block.type === "parenthetical" && "mb-0 justify-center",
+      block.type === "transition" && "mt-4 mb-2",
+      block.type === "section" && "mt-8 mb-2",
+    )}>
+
+      {/* Etiqueta de tipo — columna izquierda */}
+      {!isCharOrTrans && (
+        <div className="w-[90px] shrink-0 pt-1.5 pr-2 text-right hidden md:block">
+          <span className={cn(
+            "text-[9px] font-bold uppercase tracking-widest leading-none opacity-0 group-hover:opacity-100 transition-opacity",
+            cfg.labelColor
+          )}>
+            {cfg.label.replace(/^[^\s]+\s/, "")}
+          </span>
+        </div>
       )}
 
-      {isSection && (
-        <p className="text-[9px] font-bold uppercase tracking-widest text-accent/60 mb-0.5">
-          — Sección —
-        </p>
-      )}
+      {/* Bloque principal */}
+      <div className={cn(
+        "flex-1 min-w-0 rounded-md px-3 py-1.5",
+        cfg.leftBorder,
+        cfg.bg,
+        cfg.indent,
+        isCharOrTrans && "w-full max-w-[380px]"
+      )}>
 
-      <textarea
-        ref={ta}
-        value={value}
-        disabled={disabled}
-        rows={1}
-        className={taClass}
-        style={{
-          fontFamily: isDial || isChar
-            ? "'Courier Prime', 'Courier New', Courier, monospace"
-            : "inherit",
-        }}
-        spellCheck={false}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={() => { if (value !== block.text) onCommit(block.id, value) }}
-        onKeyDown={(e) => {
-          if ((e.key === "Backspace" || e.key === "Delete") && value.trim() === "" && onDelete) {
-            e.preventDefault()
-            onDelete(block.id)
-          }
-        }}
-      />
+        {/* Badge siempre visible para bloques semánticos */}
+        {block.semanticTag !== "none" && (
+          <span className={cn(
+            "inline-block text-[8px] font-bold uppercase tracking-widest mb-1 px-1.5 py-0.5 rounded-sm",
+            cfg.labelColor,
+            cfg.bg ? "bg-white/40 dark:bg-black/20" : "bg-gray-100 dark:bg-white/5"
+          )}>
+            {cfg.label}
+          </span>
+        )}
+
+        {/* Para escena — badge visible siempre */}
+        {block.type === "scene_heading" && (
+          <span className={cn(
+            "inline-block text-[8px] font-bold uppercase tracking-widest mb-1 mr-2",
+            cfg.labelColor, "opacity-70"
+          )}>
+            {cfg.label.replace(/^[^\s]+\s/, "")}
+          </span>
+        )}
+
+        <textarea
+          ref={ta}
+          value={value}
+          disabled={disabled}
+          rows={1}
+          className={cn(
+            "w-full resize-none bg-transparent outline-none",
+            "focus-visible:ring-0 transition-colors",
+            cfg.textClass,
+            disabled && "cursor-not-allowed opacity-50"
+          )}
+          style={{
+            fontFamily: block.type === "dialogue" || block.type === "character"
+              ? "'Courier Prime', 'Courier New', Courier, monospace"
+              : "inherit",
+            lineHeight: "1.6",
+          }}
+          spellCheck={false}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => { if (value !== block.text) onCommit(block.id, value) }}
+          onKeyDown={(e) => {
+            if ((e.key === "Backspace" || e.key === "Delete") && value.trim() === "" && onDelete) {
+              e.preventDefault()
+              onDelete(block.id)
+            }
+          }}
+        />
+      </div>
     </div>
   )
 }
