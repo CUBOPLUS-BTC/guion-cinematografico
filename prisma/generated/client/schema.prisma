@@ -90,6 +90,7 @@ model Project {
 
   title    String
   logline  String           @default("")
+  synopsis String           @default("")
   genre    Genre            @default(DRAMA)
   format   ScreenplayFormat @default(FEATURE)
   language String           @default("es")

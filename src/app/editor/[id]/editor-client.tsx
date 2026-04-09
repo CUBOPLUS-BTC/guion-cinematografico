@@ -1,6 +1,7 @@
 "use client"
 
 import { ChatPanel } from "@/editor-engine/components/chat-panel"
+import { SynopsisPanel } from "@/editor-engine/components/synopsis-panel"
 import { ChatProvider } from "@/editor-engine/components/chat-context"
 import { EditorFooter } from "@/editor-engine/components/editor-footer"
 import { EditorHeader } from "@/editor-engine/components/editor-header"
@@ -33,9 +34,10 @@ export type EditorClientProps = {
   projectId: string
   initialTitle: string
   initialContent: unknown
-  /** `Project.settings` desde Prisma (JSON); incluye `modifiers` si existía. */
   initialSettings: unknown
   initialChatMessages: UIMessage[]
+  initialLogline?: string
+  initialSynopsis?: string
 }
 
 export function EditorClient({
@@ -44,6 +46,8 @@ export function EditorClient({
   initialContent,
   initialSettings,
   initialChatMessages,
+  initialLogline = "",
+  initialSynopsis = "",
 }: EditorClientProps) {
   const { stats } = useEditorStore()
   const setProject = useProjectStore((s) => s.setProject)
@@ -263,7 +267,18 @@ export function EditorClient({
 
         <div className="flex-1 flex flex-col min-h-0 min-w-0">
           <EditorLayout
-            chatSlot={<ChatPanel />}
+            chatSlot={
+              <ChatPanel
+                synopsisSlot={
+                  <SynopsisPanel
+                    projectId={projectId}
+                    model="openai/gpt-oss-20b:free"
+                    initialLogline={initialLogline}
+                    initialSynopsis={initialSynopsis}
+                  />
+                }
+              />
+            }
             previewSlot={<PreviewPanel />}
             modifiersSlot={<ModifiersPanel className="border-0 rounded-none" />}
           />

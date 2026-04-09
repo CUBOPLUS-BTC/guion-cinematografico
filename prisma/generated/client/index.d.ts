@@ -3009,6 +3009,7 @@ export namespace Prisma {
     userId: string | null
     title: string | null
     logline: string | null
+    synopsis: string | null
     genre: $Enums.Genre | null
     format: $Enums.ScreenplayFormat | null
     language: string | null
@@ -3022,6 +3023,7 @@ export namespace Prisma {
     userId: string | null
     title: string | null
     logline: string | null
+    synopsis: string | null
     genre: $Enums.Genre | null
     format: $Enums.ScreenplayFormat | null
     language: string | null
@@ -3035,6 +3037,7 @@ export namespace Prisma {
     userId: number
     title: number
     logline: number
+    synopsis: number
     genre: number
     format: number
     language: number
@@ -3052,6 +3055,7 @@ export namespace Prisma {
     userId?: true
     title?: true
     logline?: true
+    synopsis?: true
     genre?: true
     format?: true
     language?: true
@@ -3065,6 +3069,7 @@ export namespace Prisma {
     userId?: true
     title?: true
     logline?: true
+    synopsis?: true
     genre?: true
     format?: true
     language?: true
@@ -3078,6 +3083,7 @@ export namespace Prisma {
     userId?: true
     title?: true
     logline?: true
+    synopsis?: true
     genre?: true
     format?: true
     language?: true
@@ -3166,6 +3172,7 @@ export namespace Prisma {
     userId: string
     title: string
     logline: string
+    synopsis: string
     genre: $Enums.Genre
     format: $Enums.ScreenplayFormat
     language: string
@@ -3198,6 +3205,7 @@ export namespace Prisma {
     userId?: boolean
     title?: boolean
     logline?: boolean
+    synopsis?: boolean
     genre?: boolean
     format?: boolean
     language?: boolean
@@ -3218,6 +3226,7 @@ export namespace Prisma {
     userId?: boolean
     title?: boolean
     logline?: boolean
+    synopsis?: boolean
     genre?: boolean
     format?: boolean
     language?: boolean
@@ -3234,6 +3243,7 @@ export namespace Prisma {
     userId?: boolean
     title?: boolean
     logline?: boolean
+    synopsis?: boolean
     genre?: boolean
     format?: boolean
     language?: boolean
@@ -3250,6 +3260,7 @@ export namespace Prisma {
     userId?: boolean
     title?: boolean
     logline?: boolean
+    synopsis?: boolean
     genre?: boolean
     format?: boolean
     language?: boolean
@@ -3260,7 +3271,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "logline" | "genre" | "format" | "language" | "content" | "settings" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "logline" | "synopsis" | "genre" | "format" | "language" | "content" | "settings" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     versions?: boolean | Project$versionsArgs<ExtArgs>
@@ -3288,6 +3299,7 @@ export namespace Prisma {
       userId: string
       title: string
       logline: string
+      synopsis: string
       genre: $Enums.Genre
       format: $Enums.ScreenplayFormat
       language: string
@@ -3727,6 +3739,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"Project", 'String'>
     readonly title: FieldRef<"Project", 'String'>
     readonly logline: FieldRef<"Project", 'String'>
+    readonly synopsis: FieldRef<"Project", 'String'>
     readonly genre: FieldRef<"Project", 'Genre'>
     readonly format: FieldRef<"Project", 'ScreenplayFormat'>
     readonly language: FieldRef<"Project", 'String'>
@@ -11934,6 +11947,7 @@ export namespace Prisma {
     userId: 'userId',
     title: 'title',
     logline: 'logline',
+    synopsis: 'synopsis',
     genre: 'genre',
     format: 'format',
     language: 'language',
@@ -12357,6 +12371,7 @@ export namespace Prisma {
     userId?: StringFilter<"Project"> | string
     title?: StringFilter<"Project"> | string
     logline?: StringFilter<"Project"> | string
+    synopsis?: StringFilter<"Project"> | string
     genre?: EnumGenreFilter<"Project"> | $Enums.Genre
     format?: EnumScreenplayFormatFilter<"Project"> | $Enums.ScreenplayFormat
     language?: StringFilter<"Project"> | string
@@ -12376,6 +12391,7 @@ export namespace Prisma {
     userId?: SortOrder
     title?: SortOrder
     logline?: SortOrder
+    synopsis?: SortOrder
     genre?: SortOrder
     format?: SortOrder
     language?: SortOrder
@@ -12398,6 +12414,7 @@ export namespace Prisma {
     userId?: StringFilter<"Project"> | string
     title?: StringFilter<"Project"> | string
     logline?: StringFilter<"Project"> | string
+    synopsis?: StringFilter<"Project"> | string
     genre?: EnumGenreFilter<"Project"> | $Enums.Genre
     format?: EnumScreenplayFormatFilter<"Project"> | $Enums.ScreenplayFormat
     language?: StringFilter<"Project"> | string
@@ -12417,6 +12434,7 @@ export namespace Prisma {
     userId?: SortOrder
     title?: SortOrder
     logline?: SortOrder
+    synopsis?: SortOrder
     genre?: SortOrder
     format?: SortOrder
     language?: SortOrder
@@ -12438,6 +12456,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Project"> | string
     title?: StringWithAggregatesFilter<"Project"> | string
     logline?: StringWithAggregatesFilter<"Project"> | string
+    synopsis?: StringWithAggregatesFilter<"Project"> | string
     genre?: EnumGenreWithAggregatesFilter<"Project"> | $Enums.Genre
     format?: EnumScreenplayFormatWithAggregatesFilter<"Project"> | $Enums.ScreenplayFormat
     language?: StringWithAggregatesFilter<"Project"> | string
@@ -13032,6 +13051,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -13051,6 +13071,7 @@ export namespace Prisma {
     userId: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -13068,6 +13089,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -13087,6 +13109,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -13105,6 +13128,7 @@ export namespace Prisma {
     userId: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -13119,6 +13143,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -13134,6 +13159,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -13949,6 +13975,7 @@ export namespace Prisma {
     userId?: SortOrder
     title?: SortOrder
     logline?: SortOrder
+    synopsis?: SortOrder
     genre?: SortOrder
     format?: SortOrder
     language?: SortOrder
@@ -13964,6 +13991,7 @@ export namespace Prisma {
     userId?: SortOrder
     title?: SortOrder
     logline?: SortOrder
+    synopsis?: SortOrder
     genre?: SortOrder
     format?: SortOrder
     language?: SortOrder
@@ -13977,6 +14005,7 @@ export namespace Prisma {
     userId?: SortOrder
     title?: SortOrder
     logline?: SortOrder
+    synopsis?: SortOrder
     genre?: SortOrder
     format?: SortOrder
     language?: SortOrder
@@ -15213,6 +15242,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15230,6 +15260,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15366,6 +15397,7 @@ export namespace Prisma {
     userId?: StringFilter<"Project"> | string
     title?: StringFilter<"Project"> | string
     logline?: StringFilter<"Project"> | string
+    synopsis?: StringFilter<"Project"> | string
     genre?: EnumGenreFilter<"Project"> | $Enums.Genre
     format?: EnumScreenplayFormatFilter<"Project"> | $Enums.ScreenplayFormat
     language?: StringFilter<"Project"> | string
@@ -15731,6 +15763,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15749,6 +15782,7 @@ export namespace Prisma {
     userId: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15781,6 +15815,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -15799,6 +15834,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -15815,6 +15851,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15833,6 +15870,7 @@ export namespace Prisma {
     userId: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15865,6 +15903,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -15883,6 +15922,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -15899,6 +15939,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15917,6 +15958,7 @@ export namespace Prisma {
     userId: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -15949,6 +15991,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -15967,6 +16010,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -16211,6 +16255,7 @@ export namespace Prisma {
     id?: string
     title: string
     logline?: string
+    synopsis?: string
     genre?: $Enums.Genre
     format?: $Enums.ScreenplayFormat
     language?: string
@@ -16245,6 +16290,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -16262,6 +16308,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string
@@ -16279,6 +16326,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     logline?: StringFieldUpdateOperationsInput | string
+    synopsis?: StringFieldUpdateOperationsInput | string
     genre?: EnumGenreFieldUpdateOperationsInput | $Enums.Genre
     format?: EnumScreenplayFormatFieldUpdateOperationsInput | $Enums.ScreenplayFormat
     language?: StringFieldUpdateOperationsInput | string

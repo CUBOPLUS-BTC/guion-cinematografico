@@ -57,6 +57,8 @@ export default async function EditorPage({
       initialContent={project.content}
       initialSettings={project.settings}
       initialChatMessages={initialChatMessages}
+      initialLogline={project.logline ?? ""}
+      initialSynopsis={(project as { synopsis?: string }).synopsis ?? ""}
     />
   )
 }

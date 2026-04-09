@@ -28,9 +28,10 @@ export const DEFAULT_MODEL = "openai/gpt-oss-20b:free"
 
 export type ChatPanelProps = {
   compact?: boolean
+  synopsisSlot?: ReactNode
 }
 
-export function ChatPanel({ compact }: ChatPanelProps) {
+export function ChatPanel({ compact, synopsisSlot }: ChatPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollAnchorRef = useRef<HTMLDivElement>(null)
   const { messages, busy, runQuickAction, submitChat, stop, setModel, apiError, clearApiError } = useEditorChat()
@@ -100,8 +101,14 @@ export function ChatPanel({ compact }: ChatPanelProps) {
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
       <ScrollArea className="flex-1 min-h-0">
         <div className={`${padX} py-4 ${maxW} space-y-4`}>
+          {synopsisSlot && (
+            <div className="pt-1">
+              {synopsisSlot}
+            </div>
+          )}
+
           {messages.length === 0 && !apiError && (
-            <p className="text-sm text-text-muted text-center italic py-6">
+            <p className="text-sm text-text-muted text-center italic py-4">
               Escribe una instrucción o usa una acción rápida abajo para generar tu guion.
             </p>
           )}

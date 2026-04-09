@@ -138,6 +138,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   userId: 'userId',
   title: 'title',
   logline: 'logline',
+  synopsis: 'synopsis',
   genre: 'genre',
   format: 'format',
   language: 'language',
