@@ -28,7 +28,7 @@ export default function BillingPage() {
   ];
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700">
+    <div className="space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-text-primary">Suscripción y Facturación</h1>
         <p className="text-text-muted">Gestiona tu plan y accede a potentes herramientas de escritura.</p>

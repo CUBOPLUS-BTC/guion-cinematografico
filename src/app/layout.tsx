@@ -30,6 +30,7 @@ export default function RootLayout({
     <html
       lang="es"
       className={`${inter.variable} ${courierPrime.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body
         className={`${inter.variable} ${courierPrime.variable} min-h-full flex flex-col`}

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* Streamdown (Tailwind v4): incluir clases generadas en node_modules */
 @source "../../node_modules/streamdown/dist/*.js";
 @source "../../node_modules/@streamdown/code/dist/*.js";
@@ -11,16 +13,16 @@
     --bg-secondary: oklch(0.96 0.003 260);
     --bg-tertiary: oklch(0.92 0.004 260);
     --bg-canvas: oklch(1 0 0);
-    
+
     --text-primary: oklch(0.15 0.005 260);
     --text-secondary: oklch(0.40 0.01 260);
     --text-muted: oklch(0.55 0.01 260);
-    
+
     /* --- Accent (Amber/Gold) --- */
     --accent: oklch(0.70 0.14 75);
     --accent-hover: oklch(0.65 0.13 75);
     --accent-muted: oklch(0.90 0.05 75);
-    
+
     /* --- Fountain (Light Mode Adjusted) --- */
     --fountain-scene: oklch(0.45 0.12 155);
     --fountain-character: oklch(0.40 0.10 240);
@@ -34,6 +36,16 @@
     --warning: oklch(0.70 0.14 75);
     --error: oklch(0.55 0.18 25);
     --info: oklch(0.55 0.12 240);
+
+    /* Sidebar (shadcn) — alineado con tokens del proyecto */
+    --sidebar: var(--bg-secondary);
+    --sidebar-foreground: var(--text-primary);
+    --sidebar-primary: var(--accent);
+    --sidebar-primary-foreground: oklch(0.99 0 0);
+    --sidebar-accent: var(--bg-tertiary);
+    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-border: var(--accent-muted);
+    --sidebar-ring: var(--accent);
   }
 
   .dark {
@@ -42,16 +54,16 @@
     --bg-secondary: oklch(0.17 0.005 260);
     --bg-tertiary: oklch(0.21 0.008 260);
     --bg-canvas: oklch(0.98 0.002 260);
-    
+
     --text-primary: oklch(0.95 0.005 260);
     --text-secondary: oklch(0.65 0.01 260);
     --text-muted: oklch(0.45 0.01 260);
-    
+
     /* --- Accent (Dark Mode) --- */
     --accent: oklch(0.75 0.15 75);
     --accent-hover: oklch(0.80 0.16 75);
     --accent-muted: oklch(0.35 0.06 75);
-    
+
     /* --- Fountain (Dark Mode) --- */
     --fountain-scene: oklch(0.70 0.15 155);
     --fountain-character: oklch(0.75 0.12 240);
@@ -65,6 +77,15 @@
     --warning: oklch(0.80 0.15 75);
     --error: oklch(0.65 0.20 25);
     --info: oklch(0.70 0.12 240);
+
+    --sidebar: var(--bg-secondary);
+    --sidebar-foreground: var(--text-primary);
+    --sidebar-primary: var(--accent);
+    --sidebar-primary-foreground: oklch(0.15 0.02 260);
+    --sidebar-accent: var(--bg-tertiary);
+    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-border: var(--accent-muted);
+    --sidebar-ring: var(--accent);
   }
 }
 
@@ -72,25 +93,25 @@
   /* ===========================
      COLOR SYSTEM
      =========================== */
-  
+
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
   --color-bg-tertiary: var(--bg-tertiary);
   --color-bg-canvas: var(--bg-canvas);
-  
+
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
-  
+
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-muted: var(--accent-muted);
-  
+
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
   --color-info: var(--info);
-  
+
   --color-fountain-scene: var(--fountain-scene);
   --color-fountain-character: var(--fountain-character);
   --color-fountain-dialogue: var(--fountain-dialogue);
@@ -98,15 +119,30 @@
   --color-fountain-parenthetical: var(--fountain-parenthetical);
   --color-fountain-transition: var(--fountain-transition);
   --color-fountain-note: var(--fountain-note);
-  
+
+  /* shadcn/ui semánticos (alineados con tokens del proyecto) */
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-muted: var(--bg-tertiary);
+  --color-muted-foreground: var(--text-muted);
+  --color-primary: var(--accent);
+  --color-primary-foreground: oklch(0.99 0 0);
+  --color-secondary: var(--bg-secondary);
+  --color-secondary-foreground: var(--text-primary);
+  --color-accent-foreground: var(--text-primary);
+  --color-destructive: var(--error);
+  --color-border: var(--accent-muted);
+  --color-input: var(--accent-muted);
+  --color-ring: var(--accent);
+
   /* ===========================
      TYPOGRAPHY
      =========================== */
-  
+
   --font-sans: "Inter", "SF Pro Display", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
   --font-screenplay: "Courier Prime", "Courier New", monospace;
-  
+
   --font-size-xs: 0.64rem;
   --font-size-sm: 0.8rem;
   --font-size-base: 1rem;
@@ -114,10 +150,10 @@
   --font-size-xl: 1.563rem;
   --font-size-2xl: 1.953rem;
   --font-size-3xl: 2.441rem;
-  
+
   --font-size-screenplay: 12pt;
   --line-height-screenplay: 1;
-  
+
   /* ===========================
      SPACING
      =========================== */
@@ -132,7 +168,7 @@
   --spacing-10: 2.5rem;
   --spacing-12: 3rem;
   --spacing-16: 4rem;
-  
+
   /* ===========================
      BORDER RADIUS
      =========================== */
@@ -141,7 +177,7 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-full: 9999px;
-  
+
   /* ===========================
      SHADOWS
      =========================== */
@@ -149,7 +185,7 @@
   --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.15);
   --shadow-glow: 0 0 20px oklch(0.75 0.15 75 / 0.15);
-  
+
   /* ===========================
      TRANSITIONS
      =========================== */
@@ -170,4 +206,15 @@
   body {
     @apply antialiased;
   }
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }

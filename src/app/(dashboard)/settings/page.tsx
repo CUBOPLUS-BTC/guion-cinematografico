@@ -23,7 +23,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 md:space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-primary">Configuración</h1>
         <p className="text-sm md:text-base text-text-muted">Administra tu perfil y preferencias de cuenta.</p>
