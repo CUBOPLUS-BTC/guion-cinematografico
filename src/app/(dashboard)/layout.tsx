@@ -8,6 +8,8 @@ import { signOut } from "next-auth/react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+
 export default function DashboardLayout({
   children,
 }: {
@@ -53,7 +55,8 @@ export default function DashboardLayout({
         })}
       </nav>
 
-      <div className="p-4 border-t border-accent-muted">
+      <div className="p-4 border-t border-accent-muted space-y-1">
+        <ThemeToggle />
         <button
           onClick={() => void signOut()}
           className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-text-muted hover:text-red-500 hover:bg-red-500/5 transition-colors"

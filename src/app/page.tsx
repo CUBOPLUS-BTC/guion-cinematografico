@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Film, Wand2, Zap, Shield, Rocket } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function LandingPage() {
   return (
@@ -14,6 +15,7 @@ export default function LandingPage() {
           <span className="font-bold text-xl tracking-tighter">GUION.AI</span>
         </div>
         <div className="flex items-center gap-6">
+          <ThemeToggle />
           <Link href="/login" className="text-sm font-medium hover:text-accent transition-colors">Iniciar Sesión</Link>
           <Button asChild className="bg-accent hover:bg-accent/90 text-white rounded-full px-6">
             <Link href="/dashboard">Empezar a Escribir</Link>
