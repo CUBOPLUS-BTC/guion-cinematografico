@@ -6,13 +6,11 @@ interface ChatStoreState {
   documentFountain: string
   isDirty: boolean
   pendingAction: ChatDocumentAction
-  streamingPreview: string | null
 
   setDocumentFountain: (value: string, options?: { markDirty?: boolean }) => void
   /** Tras respuesta del asistente: fusiona texto en el documento y marca sucio. */
   applyAssistantOutput: (assistantText: string, action: ChatDocumentAction) => void
   setPendingAction: (action: ChatDocumentAction) => void
-  setStreamingPreview: (value: string | null) => void
   markClean: () => void
   markDirty: () => void
   /** Payload guardado en API (JSON). */
@@ -23,7 +21,6 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   documentFountain: "",
   isDirty: false,
   pendingAction: "chat",
-  streamingPreview: null,
 
   setDocumentFountain: (value, options) =>
     set({
@@ -37,12 +34,10 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     set({
       documentFountain: merged,
       isDirty: true,
-      streamingPreview: null,
     })
   },
 
   setPendingAction: (pendingAction) => set({ pendingAction }),
-  setStreamingPreview: (streamingPreview) => set({ streamingPreview }),
 
   markClean: () => set({ isDirty: false }),
   markDirty: () => set({ isDirty: true }),

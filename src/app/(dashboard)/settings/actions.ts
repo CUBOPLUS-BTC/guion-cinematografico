@@ -19,7 +19,7 @@ export async function updateProfile(prevState: any, formData: FormData) {
   const result = updateProfileSchema.safeParse({ name })
 
   if (!result.success) {
-    return { error: result.error.errors[0].message }
+    return { error: result.error.issues[0]?.message ?? "Datos inválidos" }
   }
 
   try {

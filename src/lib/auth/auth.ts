@@ -7,6 +7,7 @@ import { authConfig } from "./config"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  // @ts-expect-error - PrismaAdapter type mismatch due to custom generated client path
   adapter: PrismaAdapter(prisma),
   providers: [
     ...authConfig.providers,

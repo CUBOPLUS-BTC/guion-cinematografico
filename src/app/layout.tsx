@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter, Courier_Prime } from "next/font/google"
 import "./globals.css"
+import "streamdown/styles.css"
 import { Providers } from "./providers"
 
 const inter = Inter({

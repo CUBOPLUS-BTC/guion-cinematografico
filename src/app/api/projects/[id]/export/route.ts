@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth/auth"
 import { getOwnedProjectOrNull } from "@/lib/api/project-access"
 import { PDFGenerator, PDFExportOptions } from "@/lib/core/export/pdf-generator"
 import { FDXGenerator } from "@/lib/core/export/fdx-generator"
-import { convertTipTapToFountain } from "@/lib/core/fountain/convert-tiptap"
+import { projectContentToFountainElements } from "@/lib/core/fountain/project-content"
 import { NextResponse } from "next/server"
 
 export const runtime = "nodejs"
@@ -40,7 +40,7 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const format = body.format ?? "pdf"
-  const elements = convertTipTapToFountain(project.content as object)
+  const elements = projectContentToFountainElements(project.content)
 
   const safeName =
     project.title.replace(/[^\w\s-]/g, "").trim().slice(0, 80) || "guion"

@@ -18,9 +18,6 @@ interface EditorState {
   stats: EditorStats
   updateStatsFromFountain: (fountainText: string) => void
 
-  zoom: number
-  setZoom: (zoom: number) => void
-
   outline: unknown[]
 }
 
@@ -67,9 +64,6 @@ export const useEditorStore = create<EditorState>((set) => ({
       },
     })
   },
-
-  zoom: 100,
-  setZoom: (zoom) => set({ zoom }),
 
   outline: [],
 }))

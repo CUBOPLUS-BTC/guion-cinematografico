@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth/auth"
 import { prisma } from "@/lib/prisma"
 import { getOwnedProjectOrNull } from "@/lib/api/project-access"
-import type { Genre, ProjectStatus, ScreenplayFormat } from "@prisma/client"
+import type { Genre, ProjectStatus, ScreenplayFormat } from "../../../../prisma/generated/client"
 
 type RouteContext = { params: Promise<{ id: string }> }
 

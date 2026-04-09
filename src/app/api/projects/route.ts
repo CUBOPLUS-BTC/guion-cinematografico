@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth/auth"
 import { prisma } from "@/lib/prisma"
-import { DEFAULT_EDITOR_JSON } from "@/lib/core/editor-default-content"
+import { defaultProjectContent } from "@/lib/core/fountain/project-content"
 
 export async function GET() {
   const session = await auth()
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       userId: session.user.id,
       title: body.title?.trim() || "Sin título",
       logline: body.logline?.trim() ?? "",
-      content: DEFAULT_EDITOR_JSON as object,
+      content: defaultProjectContent() as object,
     },
   })
 
