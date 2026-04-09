@@ -204,10 +204,23 @@ export async function POST(req: Request, context: RouteContext) {
       action,
     })
 
+    // Algunos modelos gratuitos (Gemma, etc.) no soportan system prompt.
+    // Para esos, inyectamos el system como primer mensaje de usuario.
+    const noSystemModels = ["gemma", "google/gemma"]
+    const useSystemAsUser = noSystemModels.some((m) => modelId.includes(m))
+
+    const finalMessages = useSystemAsUser
+      ? [
+          { role: "user" as const, content: `[INSTRUCCIONES DEL SISTEMA]\n${system}\n\n[FIN INSTRUCCIONES]` },
+          { role: "assistant" as const, content: "Entendido. Seguiré las instrucciones al pie de la letra y responderé solo con texto Fountain." },
+          ...modelMessages,
+        ]
+      : modelMessages
+
     const result = await streamText({
       model: openrouter(modelId),
-      system,
-      messages: modelMessages,
+      system: useSystemAsUser ? undefined : system,
+      messages: finalMessages,
       temperature: 0.8,
       onFinish: async ({ text, totalUsage }) => {
         const out = text.trim()

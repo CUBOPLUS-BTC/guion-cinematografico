@@ -24,34 +24,41 @@ import {
 
 // ─── Modelos disponibles ──────────────────────────────────────────────────────
 export const AI_MODELS = [
-  // GRATUITOS
+  // GRATUITOS — soportan system prompt
   {
     id: "meta-llama/llama-3.1-8b-instruct:free",
     label: "Llama 3.1 8B",
     provider: "Meta",
     tier: "free" as const,
-    note: "Rápido y ligero",
+    note: "Recomendado gratis",
   },
   {
-    id: "google/gemma-3-12b-it:free",
-    label: "Gemma 3 12B",
-    provider: "Google",
+    id: "meta-llama/llama-3.3-70b-instruct:free",
+    label: "Llama 3.3 70B",
+    provider: "Meta",
     tier: "free" as const,
-    note: "Buena calidad gratis",
+    note: "Alta calidad, gratis",
   },
   {
     id: "mistralai/mistral-7b-instruct:free",
     label: "Mistral 7B",
     provider: "Mistral",
     tier: "free" as const,
-    note: "Creativo y fluido",
+    note: "Fluido y creativo",
   },
   {
-    id: "deepseek/deepseek-r1-0528:free",
-    label: "DeepSeek R1",
+    id: "qwen/qwen-2.5-72b-instruct:free",
+    label: "Qwen 2.5 72B",
+    provider: "Alibaba",
+    tier: "free" as const,
+    note: "Muy capaz, gratis",
+  },
+  {
+    id: "deepseek/deepseek-chat-v3-0324:free",
+    label: "DeepSeek V3",
     provider: "DeepSeek",
     tier: "free" as const,
-    note: "Razonamiento avanzado",
+    note: "Excelente calidad",
   },
   // DE PAGA
   {
@@ -59,7 +66,7 @@ export const AI_MODELS = [
     label: "Claude 3 Haiku",
     provider: "Anthropic",
     tier: "pro" as const,
-    note: "Rápido, preciso",
+    note: "Rápido y preciso",
   },
   {
     id: "anthropic/claude-3-5-sonnet",
