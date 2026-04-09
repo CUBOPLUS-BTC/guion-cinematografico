@@ -1,6 +1,7 @@
 import { DEFAULT_EDITOR_JSON } from "@/lib/core/editor-default-content"
 import { convertTipTapToFountain } from "@/lib/core/fountain/convert-tiptap"
 import { FountainParser } from "@/lib/core/fountain/parser"
+import { parseFountainToBlocks } from "@/lib/core/fountain/semantic-parser"
 import type { FountainElement } from "@/types/fountain"
 
 /** Versión almacenada en `Project.content` para documentos Fountain en texto plano. */
@@ -39,19 +40,49 @@ export function projectContentToFountainString(content: unknown): string {
   return ""
 }
 
-/** AST Fountain para exportación PDF/FDX. */
+/**
+ * AST Fountain para exportación PDF/FDX.
+ * Usa el semantic parser para preservar etiquetas [CAMARA], [SONIDO], etc.
+ */
 export function projectContentToFountainElements(content: unknown): FountainElement[] {
   const text = projectContentToFountainString(content)
   if (!text.trim()) return []
-  return FountainParser.parse(text)
+
+  // Usar semantic parser para preservar todas las etiquetas de producción
+  const blocks = parseFountainToBlocks(text)
+
+  return blocks.map((block) => {
+    // Reconstruir el texto con el prefijo semántico para que el PDF generator lo procese
+    let displayText = block.text
+
+    if (block.type === "action" && block.semanticTag !== "none") {
+      const prefixMap: Record<string, string> = {
+        scenography: "[ESCENOGRAFIA]",
+        sound: "[SONIDO]",
+        music: "[MUSICA]",
+        camera: "[CAMARA]",
+      }
+      const prefix = prefixMap[block.semanticTag]
+      if (prefix) displayText = `${prefix} ${block.text}`
+    }
+
+    if (block.type === "note" && block.semanticTag === "time") {
+      displayText = `[[${block.text}]]`
+    }
+
+    return {
+      type: block.type,
+      text: displayText,
+      metadata: block.metadata,
+    }
+  })
 }
 
 export function fountainStringToProjectContent(fountain: string): ProjectContentV2 {
   return { v: PROJECT_CONTENT_VERSION, fountain }
 }
 
-/** Contenido por defecto al crear proyecto (misma semilla que DEFAULT_EDITOR_JSON). */
+/** Contenido por defecto al crear proyecto — vacío. */
 export function defaultProjectContent(): ProjectContentV2 {
-  const elements = convertTipTapToFountain(DEFAULT_EDITOR_JSON as object)
-  return { v: PROJECT_CONTENT_VERSION, fountain: FountainParser.stringify(elements) }
+  return { v: PROJECT_CONTENT_VERSION, fountain: "" }
 }
