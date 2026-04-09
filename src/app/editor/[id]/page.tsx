@@ -5,11 +5,13 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { useState } from "react"
+import { EditorCanvas } from "@/editor-engine/components/editor-canvas"
+import { useUIStore } from "@/editor-engine/store/ui-store"
+import { useEditorStore } from "@/editor-engine/store/editor-store"
 
 export default function EditorPage({ params }: { params: { id: string } }) {
-  const [outlineOpen, setOutlineOpen] = useState(true)
-  const [pluginsOpen, setPluginsOpen] = useState(true)
+  const { outlineOpen, pluginsOpen } = useUIStore()
+  const { stats } = useEditorStore()
 
   return (
     <div className="h-screen w-full flex flex-col bg-bg-primary overflow-hidden">
@@ -18,7 +20,9 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         <div className="flex items-center gap-4 text-sm">
           <span className="font-bold text-accent">Proyecto #{params.id}</span>
           <div className="h-4 w-px bg-accent-muted"></div>
-          <span className="text-text-secondary">Sin cambios sin guardar</span>
+          <span className="text-text-secondary">
+            {stats.wordCount} palabras | {stats.sceneCount} escenas
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {/* AI and Export buttons */}
@@ -42,8 +46,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
                   <h3 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">Estructura / Outline</h3>
                   <div className="space-y-3">
                     <div className="text-sm text-text-secondary hover:text-accent cursor-pointer">ACTO I: El Encuentro</div>
-                    <div className="text-sm pl-4 text-text-muted hover:text-accent cursor-pointer italic">INT. CAFETERIA - DIA</div>
-                    <div className="text-sm pl-4 text-text-muted hover:text-accent cursor-pointer italic">EXT. CALLE - ATARDECER</div>
+                    {/* Dynamic outline will go here */}
                   </div>
                 </div>
               </ResizablePanel>
@@ -52,21 +55,8 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           )}
 
           {/* Center Panel: Editor Canvas */}
-          <ResizablePanel defaultSize={60} className="bg-bg-primary relative overflow-y-auto">
-            <div className="max-w-[816px] mx-auto my-12 min-h-[1056px] bg-white text-black p-[1.5in] shadow-2xl relative">
-              {/* Simulation of a script page */}
-              <div className="font-screenplay text-[12pt] leading-none space-y-4">
-                <div className="uppercase">INT. CAFETERIA - DIA</div>
-                <div>A small, dimly lit coffee shop. SARAH (20s) sits alone.</div>
-                <div className="flex flex-col items-center">
-                  <div className="w-[30%]">
-                    <div className="uppercase text-center">SARAH</div>
-                    <div className="text-left italic">(to herself)</div>
-                    <div className="text-left">I've been waiting for too long.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <ResizablePanel defaultSize={pluginsOpen ? 60 : 85} className="bg-bg-primary relative overflow-hidden flex flex-col">
+            <EditorCanvas />
           </ResizablePanel>
 
           {/* Right Panel: Plugins */}
@@ -84,13 +74,6 @@ export default function EditorPage({ params }: { params: { id: string } }) {
                        <label className="text-xs font-medium text-text-secondary">Planos Cinematográficos</label>
                        <div className="h-10 border border-accent-muted rounded bg-bg-tertiary flex items-center px-3 text-sm text-text-muted italic">Seleccionar plano...</div>
                     </div>
-                    <div className="space-y-2">
-                       <label className="text-xs font-medium text-text-secondary">Iluminación</label>
-                       <div className="flex gap-2">
-                         <div className="h-8 flex-1 bg-accent-muted border border-accent rounded text-[10px] flex items-center justify-center font-bold">LOW-KEY</div>
-                         <div className="h-8 flex-1 bg-bg-tertiary border border-accent-muted rounded text-[10px] flex items-center justify-center">NATURAL</div>
-                       </div>
-                    </div>
                   </div>
                 </div>
               </ResizablePanel>
@@ -102,12 +85,12 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       {/* Footer Status Bar */}
       <footer className="h-7 border-t border-accent-muted bg-bg-tertiary flex items-center px-4 justify-between text-[10px] text-text-muted">
         <div className="flex gap-4">
-          <span>Página 1 de 1</span>
+          <span>{stats.pageCount} Pág</span>
           <span>Fountain Standard</span>
         </div>
         <div className="flex gap-4">
-          <span>IA: Conectada (Claude 3.5)</span>
-          <span className="text-success font-bold">SINCRONIZADO</span>
+          <span>IA: Conectada</span>
+          <span className="text-success font-bold uppercase">Sincronizado</span>
         </div>
       </footer>
     </div>
