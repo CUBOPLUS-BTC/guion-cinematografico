@@ -293,7 +293,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\echoe\\Desktop\\guion-cinematografico\\prisma\\generated\\client",
+      "value": "/Users/cuboai/.openclaw/workspace/guion-cinematografico/prisma/generated/client",
       "fromEnvVar": null
     },
     "config": {
@@ -302,16 +302,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "darwin-arm64",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\echoe\\Desktop\\guion-cinematografico\\prisma\\schema.prisma",
+    "sourceFilePath": "/Users/cuboai/.openclaw/workspace/guion-cinematografico/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../..",
@@ -321,7 +321,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

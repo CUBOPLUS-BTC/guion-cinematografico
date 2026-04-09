@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 export type ScreenplayBlockProps = {
   block: FountainBlock
   onCommit: (id: string, text: string) => void
+  onDelete?: (id: string) => void
   disabled?: boolean
 }
 
@@ -104,6 +105,7 @@ function semanticLabel(block: FountainBlock): string | null {
 export function ScreenplayBlock({
   block,
   onCommit,
+  onDelete,
   disabled,
 }: ScreenplayBlockProps) {
   const [value, setValue] = useState(block.text)
@@ -157,6 +159,16 @@ export function ScreenplayBlock({
             onChange={(e) => setValue(e.target.value)}
             onBlur={() => {
               if (value !== block.text) onCommit(block.id, value)
+            }}
+            onKeyDown={(e) => {
+              if (
+                (e.key === "Backspace" || e.key === "Delete") &&
+                value.trim() === "" &&
+                onDelete
+              ) {
+                e.preventDefault()
+                onDelete(block.id)
+              }
             }}
             rows={1}
             className={cn(

@@ -41,6 +41,19 @@ export function ScreenplayBlockEditor({ disabled }: { disabled?: boolean }) {
     [setDocumentFountain]
   )
 
+  const onDelete = useCallback(
+    (id: string) => {
+      setBlocks((prev) => {
+        const next = prev.filter((b) => b.id !== id)
+        const fountain = blocksToFountain(next)
+        lastEmitted.current = fountain
+        setTimeout(() => setDocumentFountain(fountain, { markDirty: true }), 0)
+        return next
+      })
+    },
+    [setDocumentFountain]
+  )
+
   if (blocks.length === 0) {
     return (
       <div className="px-4 py-12 text-center">
@@ -60,6 +73,7 @@ export function ScreenplayBlockEditor({ disabled }: { disabled?: boolean }) {
             key={block.id}
             block={block}
             onCommit={onCommit}
+            onDelete={onDelete}
             disabled={disabled}
           />
         ))}
