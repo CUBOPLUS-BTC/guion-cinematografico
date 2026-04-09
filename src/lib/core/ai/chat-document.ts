@@ -46,6 +46,8 @@ function sanitize(text: string): string {
       continue
     }
 
+    // Quitar checkboxes □ ☐ [ ] [x]
+    line = line.replace(/^(\s*)(□|☐|✓|✗|\[[ x]\])\s*/, "$1")
     // Quitar bullets de lista solo al inicio de línea
     line = line.replace(/^(\s*)([-•]\s+)/, "$1")
     // Quitar numeración de lista
@@ -74,11 +76,31 @@ function sanitize(text: string): string {
     .trim()
 }
 
+/**
+ * Detecta si el output es basura (checklists, guías, explicaciones).
+ */
+function isJunkOutput(text: string): boolean {
+  const lines = text.split("\n").filter(l => l.trim())
+  if (!lines.length) return true
+
+  // Contar líneas que parecen checkboxes o bullets de guía
+  const junkLines = lines.filter(l =>
+    /^(□|☐|✓|✗|\[[ x]\]|[-•]\s+(Formato|Escena|Acción|Diálogo|Transición|Personaje|Voz))/i.test(l.trim()) ||
+    /^(Formato Fountain|Instrucciones|Guía|Checklist|Pasos|Reglas):/i.test(l.trim())
+  )
+  // Si más del 20% son líneas de checklist → es basura
+  return junkLines.length / lines.length > 0.2
+}
+
 function looksLikeFountain(text: string): boolean {
   if (!text.trim()) return false
+  if (isJunkOutput(text)) return false
   const lines = text.split("\n").filter(l => l.trim())
-  return lines.length >= 3 &&
-    /^(INT\.|EXT\.|EST\.|#\s|>\s*(CORTE|FUNDIDO)|\[ESCENOGRAF|\[CAMARA)/im.test(text)
+  if (lines.length < 3) return false
+  // El texto debe comenzar con estructura Fountain en las primeras 5 líneas
+  const opening = lines.slice(0, 5).join("\n")
+  return /^(INT\.|EXT\.|EST\.|#\s|FADE IN:)/im.test(opening) ||
+    /\[(ESCENOGRAF|CAMARA|C[ÁA]MARA)/i.test(text)
 }
 
 /**
