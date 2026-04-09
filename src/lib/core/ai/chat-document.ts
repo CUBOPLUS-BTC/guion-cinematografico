@@ -7,133 +7,74 @@ export type ChatDocumentAction =
   | "refine"
   | "rewrite"
 
-// Etiquetas de producción válidas — NUNCA eliminar
 const VALID_SEMANTIC = /^\[(ESCENOGRAF[IÍ]A|C[AÁ]MARA|SONIDO|M[UÚ]SICA|ILUMINACI[OÓ]N|VFX)\]/i
 
 /**
- * Elimina completamente el markdown y lo convierte a texto Fountain limpio.
+ * Limpia el output de la IA: quita markdown y preserva Fountain + etiquetas semánticas.
  */
-function stripMarkdown(text: string): string {
+function sanitize(text: string): string {
   const lines = text.split(/\r?\n/)
-  const out: string[] = []
-  let insideCodeBlock = false
+  const result: string[] = []
+  let inCode = false
 
   for (const raw of lines) {
-    // Saltar bloques de código
-    if (/^```/.test(raw.trim())) { insideCodeBlock = !insideCodeBlock; continue }
-    if (insideCodeBlock) continue
+    // Bloques de código → descartar
+    if (/^```/.test(raw.trim())) { inCode = !inCode; continue }
+    if (inCode) continue
 
     let line = raw
 
-    // Saltar líneas de separador markdown (---, ___, ***)
+    // Quitar tablas markdown
+    if (/^\s*\|.+\|/.test(line)) continue
+    // Quitar separadores ---
     if (/^[-_*═]{3,}\s*$/.test(line.trim())) continue
 
-    // Saltar tablas markdown
-    if (/^\s*\|.+\|/.test(line)) continue
-
-    // Convertir encabezados markdown a texto limpio (no Fountain)
-    // # Texto → ignorar (no es un encabezado de escena Fountain)
-    // Solo preservar # si parece sección de Fountain (# ACTO I)
-    if (/^#{1,6}\s+/.test(line.trim())) {
-      const headingText = line.trim().replace(/^#{1,6}\s+/, "").trim()
-      // Si es todo mayúsculas o tiene ACTO/ACT, preservar como sección Fountain
-      if (/^(ACTO|ACT\s|PARTE\s|PART\s)/i.test(headingText)) {
-        out.push(`# ${headingText.toUpperCase()}`)
-      }
-      // Si no, descartar el encabezado markdown
-      continue
-    }
-
-    // Eliminar negrita/cursiva markdown
+    // Quitar markdown: bold, italic, inline code
     line = line
-      .replace(/\*\*\*(.+?)\*\*\*/g, "$1")
-      .replace(/\*\*(.+?)\*\*/g, "$1")
-      .replace(/\*(.+?)\*/g, "$1")
-      .replace(/___(.+?)___/g, "$1")
-      .replace(/__(.+?)__/g, "$1")
-      .replace(/_(.+?)_/g, "$1")
+      .replace(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
+      .replace(/_{1,3}([^_]+)_{1,3}/g, "$1")
+      .replace(/`([^`]+)`/g, "$1")
 
-    // Eliminar backtick inline
-    line = line.replace(/`([^`]+)`/g, "$1")
-
-    // Eliminar listas numeradas al inicio de línea (1. texto → texto)
-    // pero SOLO si no parece diálogo o acción Fountain
-    line = line.replace(/^\s*\d+\.\s+/, "")
-
-    // Eliminar bullets de lista (- texto o • texto) → texto
-    line = line.replace(/^\s*[-•]\s+/, "")
-
-    // Eliminar [links](url)
-    line = line.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-
-    // Eliminar líneas que son solo intro/cierre conversacional
-    const trimmed = line.trim()
-    if (/^(aquí (está|tienes)|espero (que|esto)|claro,|por supuesto,|a continuación)/i.test(trimmed)) continue
-    if (/^(este es el guion|el guion es|nota:|nota final)/i.test(trimmed)) continue
-
-    if (trimmed.length > 0) out.push(line.trimEnd())
-  }
-
-  return out.join("\n")
-}
-
-/**
- * Limpia etiquetas no-Fountain preservando las de producción.
- */
-function sanitizeAIOutput(text: string): string {
-  // Primero strip de markdown
-  const stripped = stripMarkdown(text)
-
-  const lines = stripped.split(/\r?\n/)
-  const out: string[] = []
-
-  for (const raw of lines) {
-    const line = raw.trim()
-
-    // Preservar etiquetas de producción válidas
-    if (VALID_SEMANTIC.test(line)) { out.push(line); continue }
-
-    // Descartar etiquetas no-Fountain
-    if (/^\[(ACCIÓN|ACCION|ACTION|TRANSICIÓN|TRANSICION|TRANSITION|ENCABEZADO|HEADING)\]$/.test(line)) continue
-
-    // [PERSONAJE] Nombre → NOMBRE
-    const charMatch = line.match(/^\[PERSONAJE\]\s*(.+)$/i)
-    if (charMatch) { out.push(charMatch[1].trim().toUpperCase()); continue }
-
-    // [DIÁLOGO] texto → texto
-    const dialogMatch = line.match(/^\[DI[ÁA]LOGO\]\s*(.*)$/i)
-    if (dialogMatch) { out.push(dialogMatch[1].trim()); continue }
-
-    // [ACOTACIÓN] texto → (texto)
-    const parenMatch = line.match(/^\[ACOTACI[ÓO]N\]\s*(.*)$/i)
-    if (parenMatch) {
-      const t = parenMatch[1].trim()
-      out.push(t.startsWith("(") ? t : `(${t})`)
+    // Convertir encabezados markdown solo si son secciones tipo "# ACTO I"
+    const headingMatch = line.trim().match(/^#{1,6}\s+(.+)$/)
+    if (headingMatch) {
+      const txt = headingMatch[1].trim()
+      if (/^(ACTO|PARTE|ACT\s|PART\s)/i.test(txt)) {
+        result.push(`# ${txt.toUpperCase()}`)
+      }
+      // Otros encabezados markdown → descartar
       continue
     }
 
-    if (line.length > 0) out.push(line)
+    // Quitar bullets de lista solo al inicio de línea
+    line = line.replace(/^(\s*)([-•]\s+)/, "$1")
+    // Quitar numeración de lista
+    line = line.replace(/^(\s*)(\d+\.\s+)/, "$1")
+
+    // Quitar frases intro/cierre conversacional
+    const t = line.trim()
+    if (!t) { result.push(""); continue }
+    if (/^(aquí (está|tienes|te)|espero|claro,|por supuesto|a continuación|este es|el guion (es|completo)|nota[: ])/i.test(t)) continue
+
+    result.push(line.trimEnd())
   }
 
-  return out.join("\n")
+  // Colapsar más de 2 líneas vacías consecutivas
+  return result
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
 }
 
-/**
- * Detecta si el texto parece Fountain válido (genérico).
- */
 function looksLikeFountain(text: string): boolean {
   if (!text.trim()) return false
   const lines = text.split("\n").filter(l => l.trim())
-  if (lines.length < 3) return false
-  // Tiene encabezado de escena, sección, etiqueta semántica o transición
-  return /^(INT\.|EXT\.|EST\.|#\s|>\s*CORTE|\[ESCENOGRAF|\[CAMARA)/im.test(text)
+  return lines.length >= 3 &&
+    /^(INT\.|EXT\.|EST\.|#\s|>\s*(CORTE|FUNDIDO)|\[ESCENOGRAF|\[CAMARA)/im.test(text)
 }
 
 /**
- * Integra la respuesta del asistente en el guion Fountain según la acción.
- * - `chat`: NO modifica el documento.
- * - `continue`: concatena.
- * - `generate`, `rewrite`, `refine`: reemplaza.
+ * Integra el output del asistente en el documento Fountain.
  */
 export function mergeAssistantFountain(
   action: ChatDocumentAction,
@@ -142,11 +83,11 @@ export function mergeAssistantFountain(
 ): string {
   if (action === "chat") return previousFountain
 
-  const sanitized = sanitizeAIOutput(assistantText.trim())
-  if (!sanitized) return previousFountain
+  const clean = sanitize(assistantText.trim())
+  if (!clean) return previousFountain
 
-  // Enriquecer con etiquetas semánticas si el modelo no las generó
-  const enriched = enrichFountainWithSemanticTags(sanitized)
+  // Enriquecer con etiquetas semánticas automáticamente
+  const enriched = enrichFountainWithSemanticTags(clean)
 
   if (action === "continue") {
     const prev = previousFountain.trimEnd()
@@ -155,7 +96,7 @@ export function mergeAssistantFountain(
 
   // generate / rewrite / refine
   if (!looksLikeFountain(enriched) && previousFountain.trim()) {
-    console.warn("[mergeAssistantFountain] Output no parece Fountain — preservando documento anterior.")
+    console.warn("[merge] Output no parece Fountain — preservando documento anterior.")
     return previousFountain
   }
 
