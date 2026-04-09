@@ -49,7 +49,10 @@ export async function POST(request: Request, context: RouteContext) {
     const blob = PDFGenerator.generate(project.title, elements, {
       includeTitlePage: body.options?.includeTitlePage,
       includeSceneNumbers: body.options?.includeSceneNumbers,
-      revision: body.options?.revision,
+      revision: body.options?.revision ?? "Borrador — Abril 2026",
+      author: "Humberto Padilla Cuenca",
+      logline: project.logline ?? "",
+      synopsis: (project as { synopsis?: string }).synopsis ?? "",
     })
     return new Response(blob, {
       headers: {

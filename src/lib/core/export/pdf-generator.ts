@@ -7,6 +7,8 @@ export interface PDFExportOptions {
   revision?: string
   author?: string
   program?: string
+  logline?: string
+  synopsis?: string
 }
 
 // ── Constantes de diseño ──────────────────────────────────────────────────
@@ -82,15 +84,26 @@ export class PDFGenerator {
     doc.setFont("helvetica", "normal")
     doc.setFontSize(FONT_SIZE)
 
+    const addPageHeader = () => {
+      const pageNum = doc.getNumberOfPages()
+      // Header line
+      doc.setDrawColor(200, 200, 210)
+      doc.setLineWidth(0.008)
+      doc.line(MARGIN.left, 0.55, PAGE_W - MARGIN.right, 0.55)
+      // Title left
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(7)
+      doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
+      doc.text(title.toUpperCase(), MARGIN.left, 0.45)
+      // Page number right
+      doc.text(`${pageNum}`, PAGE_W - MARGIN.right, 0.45, { align: "right" })
+      doc.setFontSize(FONT_SIZE)
+    }
+
     const newPage = () => {
       doc.addPage()
-      y = MARGIN.top
-      // Número de página
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(8)
-      doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-      doc.text(`${doc.getNumberOfPages()}`, PAGE_W - MARGIN.right, PAGE_H - 0.4, { align: "right" })
-      doc.setFontSize(FONT_SIZE)
+      y = MARGIN.top + 0.15  // extra space for header
+      addPageHeader()
     }
 
     const checkPage = (needed: number) => {
@@ -133,72 +146,143 @@ export class PDFGenerator {
       return ry
     }
 
-    // ── PORTADA ───────────────────────────────────────────────────────────
+    // ── PORTADA ELITE ─────────────────────────────────────────────────────
     if (options.includeTitlePage !== false) {
       const cx = PAGE_W / 2
+      const NAVY = rgb(8, 16, 40)
+      const GOLD = rgb(212, 175, 55)
+      const GOLD_LIGHT = rgb(240, 210, 100)
+      const WHITE = rgb(255, 255, 255)
+      const OFF_WHITE = rgb(230, 235, 248)
 
-      // Gradient-like header strip
-      fillRect(0, 0, PAGE_W, 2.8, rgb(15, 30, 60))
+      // Fondo negro total
+      fillRect(0, 0, PAGE_W, PAGE_H, NAVY)
 
-      // Logo / Program
+      // Barra dorada superior
+      fillRect(0, 0, PAGE_W, 0.06, GOLD)
+
+      // Sello de programa — esquina superior
       doc.setFont("helvetica", "bold")
-      doc.setFontSize(8)
-      doc.setTextColor(150, 180, 255)
-      doc.text("SOVEREIGN AI FILM FACTORY 2026  ·  CuboIA", cx, 0.55, { align: "center" })
+      doc.setFontSize(6.5)
+      doc.setTextColor(GOLD.r, GOLD.g, GOLD.b)
+      doc.text("SOVEREIGN AI FILM FACTORY 2026", cx, 0.32, { align: "center" })
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(6)
+      doc.setTextColor(OFF_WHITE.r, OFF_WHITE.g, OFF_WHITE.b)
+      doc.text("CuboIA · El Salvador", cx, 0.5, { align: "center" })
 
-      // Main title
+      // Línea dorada decorativa
+      doc.setDrawColor(GOLD.r, GOLD.g, GOLD.b)
+      doc.setLineWidth(0.005)
+      doc.line(MARGIN.left + 0.5, 0.65, PAGE_W - MARGIN.right - 0.5, 0.65)
+
+      // TÍTULO PRINCIPAL — zona central superior
+      const titleLines = doc.splitTextToSize(title.toUpperCase(), PAGE_W - 1.6) as string[]
+      const titleFontSize = titleLines.length > 2 ? 22 : titleLines.length === 2 ? 26 : 32
       doc.setFont("helvetica", "bold")
-      doc.setFontSize(26)
-      doc.setTextColor(255, 255, 255)
-      const titleLines = doc.splitTextToSize(title.toUpperCase(), PAGE_W - 2) as string[]
-      let ty = 1.2
+      doc.setFontSize(titleFontSize)
+      doc.setTextColor(WHITE.r, WHITE.g, WHITE.b)
+      let ty = 1.6
       titleLines.forEach((line: string) => {
         doc.text(line, cx, ty, { align: "center" })
-        ty += 0.42
+        ty += titleFontSize / 72 * 1.3
       })
 
-      // Revision tag
-      if (options.revision) {
-        doc.setFont("helvetica", "italic")
-        doc.setFontSize(11)
-        doc.setTextColor(200, 220, 255)
-        doc.text(options.revision, cx, ty + 0.1, { align: "center" })
-      }
+      // Línea dorada bajo título
+      ty += 0.15
+      doc.setDrawColor(GOLD.r, GOLD.g, GOLD.b)
+      doc.setLineWidth(0.025)
+      doc.line(cx - 1.2, ty, cx + 1.2, ty)
 
-      // Decorative line
-      doc.setDrawColor(80, 140, 255)
-      doc.setLineWidth(0.02)
-      doc.line(1.5, 3.1, PAGE_W - 1.5, 3.1)
+      // Revision / draft
+      ty += 0.3
+      doc.setFont("helvetica", "italic")
+      doc.setFontSize(9)
+      doc.setTextColor(GOLD_LIGHT.r, GOLD_LIGHT.g, GOLD_LIGHT.b)
+      doc.text(options.revision ?? "Primer Borrador", cx, ty, { align: "center" })
 
-      // Info block
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      doc.setTextColor(COLORS.dark.r, COLORS.dark.g, COLORS.dark.b)
-      let iy = 3.6
-      const infoItems = [
-        ["Autor:", options.author || "Humberto Padilla Cuenca"],
-        ["Tutor:", "Christian Blaze — Director / VFX Supervisor"],
-        ["Programa:", "Sovereign AI Film Factory 2026"],
-        ["Premiere:", "SovAI Summit · 19 de abril de 2026 · BINAES"],
-        ["Formato:", "Cortometraje ~90 segundos"],
-      ]
-      infoItems.forEach(([key, val]) => {
-        doc.setFont("helvetica", "bold")
-        doc.setFontSize(9)
-        setColor(COLORS.muted)
-        doc.text(key, MARGIN.left + 0.2, iy)
-        doc.setFont("helvetica", "normal")
-        setColor(COLORS.dark)
-        doc.text(val, MARGIN.left + 1.3, iy)
-        iy += 0.28
-      })
-
-      // Footer strip
-      fillRect(0, PAGE_H - 0.7, PAGE_W, 0.7, rgb(15, 30, 60))
+      // Autor
+      ty += 0.25
       doc.setFont("helvetica", "normal")
       doc.setFontSize(8)
-      doc.setTextColor(150, 180, 255)
-      doc.text("🎬 GUION.AI — Herramienta de escritura cinematográfica con IA", cx, PAGE_H - 0.32, { align: "center" })
+      doc.setTextColor(OFF_WHITE.r, OFF_WHITE.g, OFF_WHITE.b)
+      doc.text(`Escrito por ${options.author ?? "Humberto Padilla Cuenca"}`, cx, ty, { align: "center" })
+
+      // ── LOGLINE (si existe) ──────────────────────────────────────────
+      if (options.logline?.trim()) {
+        ty += 0.4
+        const loglineBox = { x: MARGIN.left + 0.4, w: CONTENT_W - 0.8 }
+        const logLines = doc.splitTextToSize(`“${options.logline.trim()}”`, loglineBox.w) as string[]
+        const boxH = logLines.length * 0.175 + 0.3
+
+        // Caja con borde dorado
+        doc.setDrawColor(GOLD.r, GOLD.g, GOLD.b)
+        doc.setLineWidth(0.012)
+        doc.roundedRect(loglineBox.x, ty, loglineBox.w, boxH, 0.06, 0.06)
+
+        doc.setFont("helvetica", "italic")
+        doc.setFontSize(9.5)
+        doc.setTextColor(GOLD_LIGHT.r, GOLD_LIGHT.g, GOLD_LIGHT.b)
+        let ly = ty + 0.2
+        logLines.forEach((line: string) => { doc.text(line, cx, ly, { align: "center" }); ly += 0.175 })
+        ty += boxH + 0.1
+      }
+
+      // ── SINOPSIS (si existe) ─────────────────────────────────────────
+      if (options.synopsis?.trim()) {
+        ty += 0.1
+        doc.setFont("helvetica", "bold")
+        doc.setFontSize(7)
+        doc.setTextColor(GOLD.r, GOLD.g, GOLD.b)
+        doc.text("SINOPSIS", cx, ty, { align: "center" })
+        ty += 0.2
+
+        const synLines = doc.splitTextToSize(options.synopsis.trim(), CONTENT_W - 0.6) as string[]
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(8.5)
+        doc.setTextColor(OFF_WHITE.r, OFF_WHITE.g, OFF_WHITE.b)
+        synLines.slice(0, 8).forEach((line: string) => { // max 8 líneas
+          doc.text(line, cx, ty, { align: "center" })
+          ty += 0.165
+        })
+      }
+
+      // ── FICHA TÉCNICA ─────────────────────────────────────────────────
+      const fichaY = PAGE_H - 2.6
+      doc.setDrawColor(GOLD.r, GOLD.g, GOLD.b)
+      doc.setLineWidth(0.005)
+      doc.line(MARGIN.left + 0.3, fichaY, PAGE_W - MARGIN.right - 0.3, fichaY)
+
+      const fichaItems = [
+        ["TUTOR",    "Christian Blaze  ·  Director / VFX Supervisor / Editor"],
+        ["PROGRAMA", "Sovereign AI Film Factory 2026  ·  CuboIA"],
+        ["PREMIERE", "SovAI Summit  ·  19 Abril 2026  ·  BINAES, El Salvador"],
+        ["FORMATO",  "Cortometraje IA  ·  ~90 segundos  ·  Aspect Ratio 2.39:1"],
+      ]
+      let fy = fichaY + 0.25
+      fichaItems.forEach(([label, val]) => {
+        doc.setFont("helvetica", "bold")
+        doc.setFontSize(6.5)
+        doc.setTextColor(GOLD.r, GOLD.g, GOLD.b)
+        doc.text(label, MARGIN.left + 0.5, fy)
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(8)
+        doc.setTextColor(OFF_WHITE.r, OFF_WHITE.g, OFF_WHITE.b)
+        doc.text(val, MARGIN.left + 1.4, fy)
+        fy += 0.26
+      })
+
+      // Barra dorada inferior
+      fillRect(0, PAGE_H - 0.55, PAGE_W, 0.55, rgb(5, 10, 28))
+      doc.setDrawColor(GOLD.r, GOLD.g, GOLD.b)
+      doc.setLineWidth(0.005)
+      doc.line(0, PAGE_H - 0.55, PAGE_W, PAGE_H - 0.55)
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(7)
+      doc.setTextColor(GOLD.r, GOLD.g, GOLD.b)
+      doc.text("GUION.AI", MARGIN.left + 0.3, PAGE_H - 0.28)
+      doc.setTextColor(OFF_WHITE.r, OFF_WHITE.g, OFF_WHITE.b)
+      doc.text("Herramienta de escritura cinematográfica con Inteligencia Artificial", cx, PAGE_H - 0.28, { align: "center" })
 
       newPage()
     }
