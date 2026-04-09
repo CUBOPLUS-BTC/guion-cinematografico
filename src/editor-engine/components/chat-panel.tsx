@@ -20,83 +20,9 @@ import {
   Wand2,
   Repeat,
   Cpu,
+  RefreshCw,
 } from "lucide-react"
-
-// ─── Modelos disponibles ──────────────────────────────────────────────────────
-export const AI_MODELS = [
-  // GRATUITOS — verificados en OpenRouter
-  {
-    id: "meta-llama/llama-3.3-70b-instruct:free",
-    label: "Llama 3.3 70B",
-    provider: "Meta",
-    tier: "free" as const,
-    note: "⭐ Recomendado gratis",
-  },
-  {
-    id: "meta-llama/llama-3.2-3b-instruct:free",
-    label: "Llama 3.2 3B",
-    provider: "Meta",
-    tier: "free" as const,
-    note: "Ligero y rápido",
-  },
-  {
-    id: "nousresearch/hermes-3-llama-3.1-405b:free",
-    label: "Hermes 3 405B",
-    provider: "NousResearch",
-    tier: "free" as const,
-    note: "Muy potente, gratis",
-  },
-  {
-    id: "qwen/qwen3-next-80b-a3b-instruct:free",
-    label: "Qwen3 80B",
-    provider: "Alibaba",
-    tier: "free" as const,
-    note: "Alta calidad",
-  },
-  {
-    id: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-    label: "Dolphin Mistral 24B",
-    provider: "CogComp",
-    tier: "free" as const,
-    note: "Creativo y fluido",
-  },
-  // DE PAGA
-  {
-    id: "anthropic/claude-3-haiku",
-    label: "Claude 3 Haiku",
-    provider: "Anthropic",
-    tier: "pro" as const,
-    note: "Rápido y preciso",
-  },
-  {
-    id: "anthropic/claude-3-5-sonnet",
-    label: "Claude 3.5 Sonnet",
-    provider: "Anthropic",
-    tier: "pro" as const,
-    note: "Alta calidad narrativa",
-  },
-  {
-    id: "openai/gpt-4o-mini",
-    label: "GPT-4o Mini",
-    provider: "OpenAI",
-    tier: "pro" as const,
-    note: "Económico y capaz",
-  },
-  {
-    id: "openai/gpt-4o",
-    label: "GPT-4o",
-    provider: "OpenAI",
-    tier: "pro" as const,
-    note: "Máxima calidad",
-  },
-  {
-    id: "google/gemini-flash-1.5",
-    label: "Gemini Flash 1.5",
-    provider: "Google",
-    tier: "pro" as const,
-    note: "Veloz y extenso",
-  },
-]
+import type { ModelInfo } from "@/app/api/models/route"
 
 export const DEFAULT_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 
@@ -108,7 +34,41 @@ export function ChatPanel({ compact }: ChatPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollAnchorRef = useRef<HTMLDivElement>(null)
   const { messages, busy, runQuickAction, submitChat, stop, setModel } = useEditorChat()
+
   const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL)
+  const [freeModels, setFreeModels] = useState<ModelInfo[]>([])
+  const [proModels, setProModels] = useState<ModelInfo[]>([])
+  const [loadingModels, setLoadingModels] = useState(true)
+  const [modelsError, setModelsError] = useState(false)
+
+  const fetchModels = useCallback(async () => {
+    setLoadingModels(true)
+    setModelsError(false)
+    try {
+      const res = await fetch("/api/models")
+      if (!res.ok) throw new Error("fetch failed")
+      const data = (await res.json()) as { free: ModelInfo[]; pro: ModelInfo[] }
+      setFreeModels(data.free ?? [])
+      setProModels(data.pro ?? [])
+
+      // Si el modelo actual no existe en la lista nueva, seleccionar el primero disponible
+      const allIds = [...(data.free ?? []), ...(data.pro ?? [])].map((m) => m.id)
+      if (allIds.length > 0 && !allIds.includes(selectedModel)) {
+        const first = data.free?.[0]?.id ?? data.pro?.[0]?.id ?? DEFAULT_MODEL
+        setSelectedModel(first)
+        setModel(first)
+      }
+    } catch {
+      setModelsError(true)
+    } finally {
+      setLoadingModels(false)
+    }
+  }, [selectedModel, setModel])
+
+  useEffect(() => {
+    void fetchModels()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -133,7 +93,8 @@ export function ChatPanel({ compact }: ChatPanelProps) {
   const padX = compact ? "px-3" : "px-4 md:px-6"
   const maxW = compact ? "max-w-none" : "max-w-xl mx-auto"
 
-  const currentModel = AI_MODELS.find((m) => m.id === selectedModel)
+  const allModels = [...freeModels, ...proModels]
+  const currentModel = allModels.find((m) => m.id === selectedModel)
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
@@ -165,55 +126,98 @@ export function ChatPanel({ compact }: ChatPanelProps) {
           {/* Selector de modelo */}
           <div className="flex items-center gap-2">
             <Cpu className="h-3.5 w-3.5 text-text-muted shrink-0" />
-            <Select value={selectedModel} onValueChange={handleModelChange}>
-              <SelectTrigger className="h-8 text-xs border-accent-muted bg-bg-tertiary flex-1 min-w-0">
-                <SelectValue>
-                  <span className="flex items-center gap-1.5 truncate">
-                    <span
-                      className={`text-[9px] font-bold px-1 py-0.5 rounded ${
-                        currentModel?.tier === "free"
-                          ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                          : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
-                      }`}
-                    >
-                      {currentModel?.tier === "free" ? "FREE" : "PRO"}
+
+            {loadingModels ? (
+              <div className="flex-1 h-8 rounded-md border border-accent-muted bg-bg-tertiary flex items-center px-3 gap-2">
+                <Loader2 className="h-3 w-3 animate-spin text-text-muted" />
+                <span className="text-xs text-text-muted">Cargando modelos...</span>
+              </div>
+            ) : modelsError ? (
+              <div className="flex-1 flex items-center gap-2">
+                <span className="text-xs text-red-500">Error al cargar modelos</span>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => void fetchModels()}>
+                  <RefreshCw className="h-3 w-3 mr-1" /> Reintentar
+                </Button>
+              </div>
+            ) : (
+              <Select value={selectedModel} onValueChange={handleModelChange}>
+                <SelectTrigger className="h-8 text-xs border-accent-muted bg-bg-tertiary flex-1 min-w-0">
+                  <SelectValue>
+                    <span className="flex items-center gap-1.5 truncate">
+                      <span
+                        className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
+                          currentModel?.tier === "free"
+                            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                            : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                        }`}
+                      >
+                        {currentModel?.tier === "free" ? "FREE" : "PRO"}
+                      </span>
+                      <span className="truncate">{currentModel?.name ?? selectedModel}</span>
+                      {currentModel?.provider && (
+                        <span className="text-text-muted shrink-0">· {currentModel.provider}</span>
+                      )}
                     </span>
-                    <span className="truncate">{currentModel?.label}</span>
-                  </span>
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {/* Modelos gratuitos */}
-                <div className="px-2 py-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">
-                    ✦ Gratuitos
-                  </p>
-                  {AI_MODELS.filter((m) => m.tier === "free").map((m) => (
-                    <SelectItem key={m.id} value={m.id} className="text-xs py-2">
-                      <span className="flex flex-col gap-0.5">
-                        <span className="font-medium">{m.label} <span className="text-text-muted font-normal">· {m.provider}</span></span>
-                        <span className="text-[10px] text-text-muted">{m.note}</span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </div>
-                <div className="border-t border-accent-muted mx-2 my-1" />
-                {/* Modelos de paga */}
-                <div className="px-2 py-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">
-                    ★ Pro (requiere créditos)
-                  </p>
-                  {AI_MODELS.filter((m) => m.tier === "pro").map((m) => (
-                    <SelectItem key={m.id} value={m.id} className="text-xs py-2">
-                      <span className="flex flex-col gap-0.5">
-                        <span className="font-medium">{m.label} <span className="text-text-muted font-normal">· {m.provider}</span></span>
-                        <span className="text-[10px] text-text-muted">{m.note}</span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </div>
-              </SelectContent>
-            </Select>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {freeModels.length > 0 && (
+                    <>
+                      <div className="px-2 pt-2 pb-1">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                          ✦ Gratuitos ({freeModels.length})
+                        </p>
+                      </div>
+                      {freeModels.map((m) => (
+                        <SelectItem key={m.id} value={m.id} className="text-xs py-2">
+                          <span className="flex flex-col gap-0.5">
+                            <span className="font-medium">
+                              {m.name}{" "}
+                              <span className="text-text-muted font-normal">· {m.provider}</span>
+                            </span>
+                            <span className="text-[10px] text-text-muted">{m.note}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+
+                  {proModels.length > 0 && (
+                    <>
+                      <div className="border-t border-accent-muted mx-2 my-1" />
+                      <div className="px-2 pt-1 pb-1">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                          ★ Pro — requiere créditos ({proModels.length})
+                        </p>
+                      </div>
+                      {proModels.map((m) => (
+                        <SelectItem key={m.id} value={m.id} className="text-xs py-2">
+                          <span className="flex flex-col gap-0.5">
+                            <span className="font-medium">
+                              {m.name}{" "}
+                              <span className="text-text-muted font-normal">· {m.provider}</span>
+                            </span>
+                            <span className="text-[10px] text-text-muted">{m.note}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+
+            {!loadingModels && !modelsError && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 shrink-0"
+                onClick={() => void fetchModels()}
+                title="Actualizar lista de modelos"
+              >
+                <RefreshCw className="h-3 w-3 text-text-muted" />
+              </Button>
+            )}
           </div>
 
           {/* Acciones rápidas */}
