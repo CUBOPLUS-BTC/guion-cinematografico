@@ -55,6 +55,7 @@ export default async function EditorPage({
       projectId={project.id}
       initialTitle={project.title}
       initialContent={project.content}
+      initialSettings={project.settings}
       initialChatMessages={initialChatMessages}
     />
   )

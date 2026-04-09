@@ -11,15 +11,30 @@ import { GenerateVideoPromptsDialog } from "@/editor-engine/components/generate-
 import { useEditorStore } from "@/editor-engine/store/editor-store"
 import { useProjectStore } from "@/editor-engine/store/project-store"
 import { useChatStore } from "@/editor-engine/store/chat-store"
-import { useEffect, useMemo } from "react"
+import { usePluginStore } from "@/editor-engine/store/plugin-store"
+import { useEffect, useMemo, useRef } from "react"
 import { initializePlugins } from "@/editor-engine/plugins/all-plugins"
 import { projectContentToFountainString } from "@/lib/core/fountain/project-content"
 import type { UIMessage } from "ai"
+
+function normalizeProjectSettings(settings: unknown): Record<string, unknown> {
+  if (settings && typeof settings === "object" && !Array.isArray(settings)) {
+    return { ...(settings as Record<string, unknown>) }
+  }
+  return {}
+}
+
+function getModifiersFromSettings(settings: unknown): unknown {
+  const base = normalizeProjectSettings(settings)
+  return base.modifiers
+}
 
 export type EditorClientProps = {
   projectId: string
   initialTitle: string
   initialContent: unknown
+  /** `Project.settings` desde Prisma (JSON); incluye `modifiers` si existía. */
+  initialSettings: unknown
   initialChatMessages: UIMessage[]
 }
 
@@ -27,6 +42,7 @@ export function EditorClient({
   projectId,
   initialTitle,
   initialContent,
+  initialSettings,
   initialChatMessages,
 }: EditorClientProps) {
   const { stats } = useEditorStore()
@@ -35,6 +51,8 @@ export function EditorClient({
   const markClean = useChatStore((s) => s.markClean)
   const getProjectContentPayload = useChatStore((s) => s.getProjectContentPayload)
   const chatDirty = useChatStore((s) => s.isDirty)
+  const modifiersDirty = usePluginStore((s) => s.isDirty)
+  const settingsBaseRef = useRef<Record<string, unknown>>(normalizeProjectSettings(initialSettings))
 
   const initialFountain = useMemo(
     () => projectContentToFountainString(initialContent),
@@ -42,8 +60,13 @@ export function EditorClient({
   )
 
   useEffect(() => {
+    settingsBaseRef.current = normalizeProjectSettings(initialSettings)
+  }, [projectId, initialSettings])
+
+  useEffect(() => {
     initializePlugins()
-  }, [])
+    usePluginStore.getState().hydrateFromSettings(getModifiersFromSettings(initialSettings))
+  }, [projectId, initialSettings])
 
   useEffect(() => {
     setProject({
@@ -79,6 +102,39 @@ export function EditorClient({
     }, 2000)
     return () => clearTimeout(t)
   }, [chatDirty, getProjectContentPayload, markClean, projectId])
+
+  useEffect(() => {
+    if (!modifiersDirty) return
+    const t = setTimeout(() => {
+      void (async () => {
+        try {
+          const modifiers = usePluginStore.getState().getSettingsPayload()
+          const merged = { ...settingsBaseRef.current, modifiers }
+          const res = await fetch(`/api/projects/${projectId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ settings: merged }),
+          })
+          if (res.ok) {
+            const updated = (await res.json()) as { settings?: unknown }
+            usePluginStore.getState().markClean()
+            if (
+              updated.settings &&
+              typeof updated.settings === "object" &&
+              !Array.isArray(updated.settings)
+            ) {
+              settingsBaseRef.current = { ...(updated.settings as Record<string, unknown>) }
+            } else {
+              settingsBaseRef.current = merged
+            }
+          }
+        } catch {
+          /* reintento en siguiente ciclo */
+        }
+      })()
+    }, 2000)
+    return () => clearTimeout(t)
+  }, [modifiersDirty, projectId])
 
   const handleExport = async (format: "pdf" | "fdx") => {
     const res = await fetch(`/api/projects/${projectId}/export`, {
