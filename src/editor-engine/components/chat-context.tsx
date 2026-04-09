@@ -35,6 +35,8 @@ export type EditorChatContextValue = {
   sendMessage: ReturnType<typeof useChat>["sendMessage"]
   stop: ReturnType<typeof useChat>["stop"]
   busy: boolean
+  apiError: string | null
+  clearApiError: () => void
   runQuickAction: (action: Exclude<ChatDocumentAction, "chat">) => Promise<void>
   submitChat: (text: string) => Promise<void>
   setModel: (model: string) => void
@@ -78,14 +80,22 @@ export function ChatProvider({
     [projectId]
   )
 
+  const [apiError, setApiError] = useState<string | null>(null)
+
   const { messages, sendMessage, status, stop } = useChat({
     id: `project-chat-${projectId}`,
     messages: initialMessages,
     transport,
     onFinish: ({ message }) => {
+      setApiError(null)
       const text = getTextFromUIMessage(message)
       const action = useChatStore.getState().pendingAction
       useChatStore.getState().applyAssistantOutput(text, action)
+      useChatStore.getState().setPendingAction("chat")
+    },
+    onError: (error) => {
+      const msg = error?.message ?? "Error al conectar con la IA"
+      setApiError(msg)
       useChatStore.getState().setPendingAction("chat")
     },
   })
@@ -123,6 +133,8 @@ export function ChatProvider({
     setActiveModel(model)
   }, [])
 
+  const clearApiError = useCallback(() => setApiError(null), [])
+
   const value = useMemo<EditorChatContextValue>(
     () => ({
       projectId,
@@ -131,6 +143,8 @@ export function ChatProvider({
       sendMessage,
       stop,
       busy,
+      apiError,
+      clearApiError,
       runQuickAction,
       submitChat,
       setModel,
@@ -142,6 +156,8 @@ export function ChatProvider({
       sendMessage,
       stop,
       busy,
+      apiError,
+      clearApiError,
       runQuickAction,
       submitChat,
       setModel,

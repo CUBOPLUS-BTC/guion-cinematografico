@@ -33,7 +33,7 @@ export type ChatPanelProps = {
 export function ChatPanel({ compact }: ChatPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollAnchorRef = useRef<HTMLDivElement>(null)
-  const { messages, busy, runQuickAction, submitChat, stop, setModel } = useEditorChat()
+  const { messages, busy, runQuickAction, submitChat, stop, setModel, apiError, clearApiError } = useEditorChat()
 
   const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL)
   const [freeModels, setFreeModels] = useState<ModelInfo[]>([])
@@ -100,10 +100,23 @@ export function ChatPanel({ compact }: ChatPanelProps) {
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
       <ScrollArea className="flex-1 min-h-0">
         <div className={`${padX} py-4 ${maxW} space-y-4`}>
-          {messages.length === 0 && (
+          {messages.length === 0 && !apiError && (
             <p className="text-sm text-text-muted text-center italic py-6">
               Escribe una instrucción o usa una acción rápida abajo para generar tu guion.
             </p>
+          )}
+
+          {apiError && (
+            <div className="rounded-lg border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-3">
+              <p className="text-xs font-semibold text-red-700 dark:text-red-400 mb-1">Error de IA</p>
+              <p className="text-xs text-red-600 dark:text-red-300 leading-relaxed">{apiError}</p>
+              <button
+                onClick={clearApiError}
+                className="mt-2 text-[10px] text-red-500 underline hover:no-underline"
+              >
+                Cerrar
+              </button>
+            </div>
           )}
           {messages.map((m) => {
             if (m.role !== "user") return null
