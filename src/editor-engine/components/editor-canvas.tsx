@@ -25,6 +25,7 @@ export function EditorCanvas({ projectId, initialContent }: EditorCanvasProps) {
   const { setEditor, updateStats, markDirty, zoom, markClean } = useEditorStore()
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: false,
