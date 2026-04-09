@@ -50,20 +50,30 @@ function sanitizeAIOutput(text: string): string {
 
 /**
  * Integra la respuesta del asistente en el guion Fountain según la acción.
+ * - `chat`: NO modifica el documento — solo es una respuesta conversacional.
  * - `continue`: concatena al documento existente.
- * - Resto: reemplaza por el texto generado (guion completo en Fountain).
+ * - `generate`, `rewrite`, `refine`: reemplaza el documento completo.
  */
 export function mergeAssistantFountain(
   action: ChatDocumentAction,
   previousFountain: string,
   assistantText: string
 ): string {
+  // En modo chat puro, la IA responde pero NO sobreescribe el guion
+  if (action === "chat") return previousFountain
+
   const next = sanitizeAIOutput(assistantText.trim())
   if (!next) return previousFountain
+
   if (action === "continue") {
     const prev = previousFountain.trimEnd()
     if (!prev) return next
     return `${prev}\n\n${next}`
   }
+
+  // generate / rewrite / refine → reemplazar solo si parece Fountain válido
+  const looksLikeFountain = /^(INT\.|EXT\.|EST\.|#|\[|VOZ|SATOSHI|NAYIB)/im.test(next)
+  if (!looksLikeFountain && previousFountain.trim()) return previousFountain
+
   return next
 }

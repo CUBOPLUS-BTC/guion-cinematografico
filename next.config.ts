@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [
-    "defensive-arnold-ready-wedding.trycloudflare.com",
+    "richards-barry-loved-burn.trycloudflare.com",
     "*.trycloudflare.com",
   ],
 };
