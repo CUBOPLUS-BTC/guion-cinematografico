@@ -1,3 +1,5 @@
+import { enrichFountainWithSemanticTags } from "@/lib/core/ai/semantic-enricher"
+
 export type ChatDocumentAction =
   | "chat"
   | "generate"
@@ -7,19 +9,31 @@ export type ChatDocumentAction =
 
 /**
  * Limpia etiquetas no-Fountain que la IA puede generar ([ACCIÓN], [PERSONAJE], etc.)
- * y las convierte al Fountain equivalente.
+ * preservando las etiquetas de producción válidas ([ESCENOGRAFIA], [CAMARA], etc.)
  */
 function sanitizeAIOutput(text: string): string {
   const lines = text.split(/\r?\n/)
   const out: string[] = []
 
+  // Etiquetas de producción válidas — NO eliminar
+  const VALID_TAGS = /^\[(ESCENOGRAF[IÍ]A|C[AÁ]MARA|SONIDO|M[UÚ]SICA|ILUMINACI[OÓ]N|VFX)\]/i
+
   for (const raw of lines) {
     const line = raw.trim()
 
-    // Descartar líneas que son solo etiquetas vacías
+    // Descartar solo etiquetas no-Fountain inválidas (vacías sin contenido)
     if (/^\[(ACCIÓN|ACCION|ACTION|TRANSICIÓN|TRANSICION|TRANSITION|ENCABEZADO|HEADING)\]$/.test(line)) {
       continue
     }
+
+    // Preservar etiquetas de producción válidas
+    if (VALID_TAGS.test(line)) {
+      out.push(line)
+      continue
+    }
+
+    // Limpiar markdown: quitar bloques de código ```
+    if (/^```/.test(line)) continue
 
     // [PERSONAJE] Nombre → NOMBRE
     const charMatch = line.match(/^\[PERSONAJE\]\s*(.+)$/i)
@@ -37,7 +51,7 @@ function sanitizeAIOutput(text: string): string {
       continue
     }
 
-    // Limpiar sufijos de etiqueta al final de la línea
+    // Limpiar sufijos de etiqueta inválidos al final de línea
     const cleaned = line
       .replace(/\s*\[(ACCIÓN|ACCION|ACTION|ENCABEZADO|HEADING|TRANSICIÓN|TRANSICION)\]\s*$/i, "")
       .trim()
@@ -46,6 +60,16 @@ function sanitizeAIOutput(text: string): string {
   }
 
   return out.join("\n")
+}
+
+/**
+ * Detecta si el texto parece Fountain válido (genérico, sin nombres hardcodeados).
+ */
+function looksLikeFountain(text: string): boolean {
+  if (!text.trim()) return false
+  // Tiene encabezado de escena, sección, etiqueta semántica o título
+  return /^(INT\.|EXT\.|EST\.|#|\[ESCENOGRAF|VOZ\s+PROFUNDA|FADE IN:|FUNDIDO)/im.test(text)
+    || text.split("\n").filter(l => l.trim()).length >= 4 // al menos 4 líneas de contenido
 }
 
 /**
@@ -62,18 +86,23 @@ export function mergeAssistantFountain(
   // En modo chat puro, la IA responde pero NO sobreescribe el guion
   if (action === "chat") return previousFountain
 
-  const next = sanitizeAIOutput(assistantText.trim())
-  if (!next) return previousFountain
+  const sanitized = sanitizeAIOutput(assistantText.trim())
+  if (!sanitized) return previousFountain
+
+  // Enriquecer con etiquetas semánticas si el modelo no las generó
+  const enriched = enrichFountainWithSemanticTags(sanitized)
 
   if (action === "continue") {
     const prev = previousFountain.trimEnd()
-    if (!prev) return next
-    return `${prev}\n\n${next}`
+    if (!prev) return enriched
+    return `${prev}\n\n${enriched}`
   }
 
-  // generate / rewrite / refine → reemplazar solo si parece Fountain válido
-  const looksLikeFountain = /^(INT\.|EXT\.|EST\.|#|\[|VOZ|SATOSHI|NAYIB)/im.test(next)
-  if (!looksLikeFountain && previousFountain.trim()) return previousFountain
+  // generate / rewrite / refine → reemplazar si parece contenido válido
+  if (!looksLikeFountain(enriched) && previousFountain.trim()) {
+    console.warn("[mergeAssistantFountain] Output no parece Fountain, preservando documento anterior.")
+    return previousFountain
+  }
 
-  return next
+  return enriched
 }
