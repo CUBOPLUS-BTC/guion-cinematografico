@@ -10,6 +10,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum Genre {
+  DRAMA
+  COMEDY
+  THRILLER
+  HORROR
+  SCIFI
+  ROMANCE
+  ACTION
+  DOCUMENTARY
+  OTHER
+}
+
+enum ScreenplayFormat {
+  FEATURE
+  SHORT
+  SERIES
+  PILOT
+  DOCUMENTARY
+}
+
+enum ProjectStatus {
+  DRAFT
+  IN_PROGRESS
+  REVIEW
+  FINAL
+}
+
+enum AIAction {
+  GENERATE
+  REFINE
+  CONTINUE
+  REWRITE
+}
+
+enum SubStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -139,11 +186,3 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-
-// Enums
-enum Plan { FREE PRO ENTERPRISE }
-enum Genre { DRAMA COMEDY THRILLER HORROR SCIFI ROMANCE ACTION DOCUMENTARY OTHER }
-enum ScreenplayFormat { FEATURE SHORT SERIES PILOT DOCUMENTARY }
-enum ProjectStatus { DRAFT IN_PROGRESS REVIEW FINAL }
-enum AIAction { GENERATE REFINE CONTINUE REWRITE }
-enum SubStatus { ACTIVE PAST_DUE CANCELED INCOMPLETE }

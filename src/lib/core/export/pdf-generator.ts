@@ -1,5 +1,15 @@
-import { jsPDF } from "jspdf";
-import { FountainElement } from "@/types/fountain";
+import { jsPDF } from "jspdf"
+import { FountainElement } from "@/types/fountain"
+
+/** Opciones alineadas con specs/09-exportacion.md */
+export interface PDFExportOptions {
+  includeTitlePage?: boolean
+  /** Reservado — numeración de escena en PDF (futuro) */
+  includeSceneNumbers?: boolean
+  /** Reservado — notas en PDF (futuro) */
+  includeNotes?: boolean
+  revision?: string
+}
 
 /**
  * Generador de PDF profesional que sigue los estándares de la industria cinematográfica:
@@ -8,7 +18,11 @@ import { FountainElement } from "@/types/fountain";
  * - Interlineado: Simple
  */
 export class PDFGenerator {
-  public static generate(title: string, elements: FountainElement[]): Blob {
+  public static generate(
+    title: string,
+    elements: FountainElement[],
+    options: PDFExportOptions = {}
+  ): Blob {
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "in",
@@ -27,10 +41,19 @@ export class PDFGenerator {
     doc.setFont("courier", "normal");
     doc.setFontSize(config.fontSize);
 
-    // 1. Portada (Opcional simplificada)
-    doc.text(title.toUpperCase(), 4.25, 4, { align: 'center' });
-    doc.addPage();
-    yPosition = config.margins.top;
+    const includeTitlePage = options.includeTitlePage !== false
+
+    // 1. Portada (opcional)
+    if (includeTitlePage) {
+      doc.text(title.toUpperCase(), 4.25, 4, { align: "center" })
+      if (options.revision) {
+        doc.setFontSize(10)
+        doc.text(options.revision, 4.25, 5.2, { align: "center" })
+        doc.setFontSize(config.fontSize)
+      }
+      doc.addPage()
+      yPosition = config.margins.top
+    }
 
     // 2. Renderizado de Elementos
     elements.forEach((el) => {

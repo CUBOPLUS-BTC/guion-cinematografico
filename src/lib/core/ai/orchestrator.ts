@@ -8,7 +8,7 @@ export interface AIRequest {
     currentScene: FountainElement[] | null;
     characters: CharacterProfile[];
   };
-  modifiers: Record<string, any>;
+  modifiers: Record<string, unknown>;
   userInstruction: string;
   model: string; 
 }

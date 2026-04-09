@@ -14,7 +14,7 @@ export type FountainElementType =
 export interface FountainElement {
   type: FountainElementType;
   text: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export type FountainJSON = FountainElement[];

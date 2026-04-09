@@ -1,21 +1,34 @@
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { streamText } from 'ai';
-import { AIOrchestrator, AIRequest } from '@/lib/core/ai/orchestrator';
+import { createOpenRouter } from "@openrouter/ai-sdk-provider"
+import { streamText } from "ai"
+import { auth } from "@/lib/auth/auth"
+import { AIOrchestrator, AIRequest } from "@/lib/core/ai/orchestrator"
 
-// Configuración de OpenRouter
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY || '',
-});
-
-export const runtime = 'edge';
+/** Node runtime: OpenRouter + AI SDK; compatible con auth() del servidor */
+export const runtime = "nodejs"
 
 export async function POST(req: Request) {
   try {
-    const body: AIRequest = await req.json();
-    
-    // Validar autenticación aquí si fuera necesario (NextAuth)
-    
-    const prompt = AIOrchestrator.buildPrompt(body);
+    const session = await auth()
+    if (!session?.user?.id) {
+      return new Response(JSON.stringify({ error: "No autorizado" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY
+    if (!apiKey?.trim()) {
+      return new Response(
+        JSON.stringify({ error: "OPENROUTER_API_KEY no configurada en el servidor" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      )
+    }
+
+    const openrouter = createOpenRouter({ apiKey })
+
+    const body: AIRequest = await req.json()
+
+    const prompt = AIOrchestrator.buildPrompt(body)
     
     const result = await streamText({
       model: openrouter(body.model || 'anthropic/claude-3-haiku'),

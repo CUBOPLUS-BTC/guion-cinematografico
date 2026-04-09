@@ -1,6 +1,5 @@
 import React from "react";
 import { PluginDefinition } from "../types";
-import { Type } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 interface DescriptionState {

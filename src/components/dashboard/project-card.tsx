@@ -1,7 +1,8 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, MoreVertical, Clock, Film } from "lucide-react";
-import Link from "next/link";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { MoreVertical, Clock, Film } from "lucide-react"
+import Link from "next/link"
+import { formatRelativePast } from "@/lib/format-relative"
 
 interface ProjectCardProps {
   id: string;
@@ -22,7 +23,7 @@ export function ProjectCard({ id, title, updatedAt, sceneCount }: ProjectCardPro
       <CardContent>
         <div className="flex items-center gap-2 text-xs text-text-muted">
           <Clock className="h-3 w-3" />
-          <span>Editado hace {new Date().getDate() - updatedAt.getDate()} días</span>
+          <span>Editado {formatRelativePast(updatedAt)}</span>
         </div>
         <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-accent uppercase tracking-tighter">
           <Film className="h-3 w-3" />

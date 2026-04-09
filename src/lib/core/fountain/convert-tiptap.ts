@@ -4,19 +4,20 @@ import { FountainElement, FountainElementType } from "@/types/fountain";
  * Convierte el formato JSON de TipTap/ProseMirror a nuestro AST interno de Fountain.
  * Esto facilita el envío de contexto limpio a la IA.
  */
-export function convertTipTapToFountain(json: any): FountainElement[] {
-  if (!json || !json.content) return [];
+export function convertTipTapToFountain(json: unknown): FountainElement[] {
+  const doc = json as { content?: unknown[] } | null
+  if (!doc?.content || !Array.isArray(doc.content)) return []
 
-  return json.content.map((node: any) => {
-    // TipTap suele envolver el texto en un array 'content'
-    const textContent = node.content 
-      ? node.content.map((c: any) => c.text || "").join("")
-      : "";
+  return doc.content.map((node: unknown) => {
+    const n = node as { type?: string; content?: { text?: string }[]; attrs?: Record<string, unknown> }
+    const textContent = n.content
+      ? n.content.map((c) => c.text || "").join("")
+      : ""
 
     return {
-      type: (node.type || "action") as FountainElementType,
+      type: (n.type || "action") as FountainElementType,
       text: textContent,
-      metadata: node.attrs || {},
-    };
-  });
+      metadata: n.attrs || {},
+    }
+  })
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { type ComponentType } from "react";
 import { pluginRegistry } from "../plugins/registry";
 import { usePluginStore } from "../store/plugin-store";
 import { 
@@ -10,7 +10,6 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import * as LucideIcons from "lucide-react";
 
@@ -27,7 +26,11 @@ export function PluginsPanel() {
       <ScrollArea className="flex-1">
         <Accordion type="multiple" className="w-full px-4 py-2">
           {plugins.map((plugin) => {
-            const Icon = (LucideIcons as any)[plugin.icon] || LucideIcons.HelpCircle;
+            const Icon =
+              (LucideIcons as unknown as Record<
+                string,
+                ComponentType<{ className?: string }>
+              >)[plugin.icon] ?? LucideIcons.HelpCircle
             const isActive = activePlugins.includes(plugin.id);
             const pluginState = states[plugin.id] || plugin.defaultState;
 

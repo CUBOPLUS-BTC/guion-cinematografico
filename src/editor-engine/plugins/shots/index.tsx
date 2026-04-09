@@ -1,66 +1,81 @@
-import React from "react";
-import { PluginDefinition } from "../types";
-import { Video } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import React from "react"
+import { PluginDefinition } from "../types"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { SHOT_CATALOG } from "./data"
 
 interface ShotsState {
-  selected: string[];
+  selected: string[]
 }
 
 export const ShotsPlugin: PluginDefinition<ShotsState> = {
   id: "shots",
   name: "Planos Cinematográficos",
-  description: "Define el tamaño y ángulo del plano para la escena.",
+  description: "Define el tamaño, ángulo y movimiento de cámara para la escena.",
   icon: "Video",
   category: "cinematography",
   version: "1.0.0",
   defaultState: { selected: [] },
 
   PanelComponent: ({ state, updateState }) => {
-    const options = [
-      { id: "ELS", label: "Extreme Long Shot" },
-      { id: "LS", label: "Long Shot" },
-      { id: "MCU", label: "Medium Close-up" },
-      { id: "CU", label: "Close-up" },
-      { id: "LOW", label: "Low Angle" },
-      { id: "HIGH", label: "High Angle" },
-      { id: "OTS", label: "Over the Shoulder" },
-    ];
-
     const toggleShot = (id: string) => {
-      const isSelected = state.selected.includes(id);
+      const isSelected = state.selected.includes(id)
       updateState({
-        selected: isSelected 
-          ? state.selected.filter(s => s !== id) 
-          : [...state.selected, id]
-      });
-    };
+        selected: isSelected
+          ? state.selected.filter((s) => s !== id)
+          : [...state.selected, id],
+      })
+    }
+
+    const byCategory = SHOT_CATALOG.reduce(
+      (acc, shot) => {
+        if (!acc[shot.category]) acc[shot.category] = []
+        acc[shot.category].push(shot)
+        return acc
+      },
+      {} as Record<string, typeof SHOT_CATALOG>
+    )
 
     return (
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {options.map((opt) => (
-            <Badge
-              key={opt.id}
-              variant={state.selected.includes(opt.id) ? "default" : "outline"}
-              className="cursor-pointer hover:bg-accent transition-colors py-1"
-              onClick={() => toggleShot(opt.id)}
-            >
-              {opt.label}
-            </Badge>
+      <ScrollArea className="max-h-64 pr-2">
+        <div className="space-y-4">
+          {Object.entries(byCategory).map(([category, shots]) => (
+            <div key={category} className="space-y-2">
+              <p className="text-[10px] font-bold uppercase text-text-muted">{category}</p>
+              <div className="flex flex-wrap gap-2">
+                {shots.map((opt) => (
+                  <Badge
+                    key={opt.id}
+                    title={opt.label}
+                    variant={state.selected.includes(opt.id) ? "default" : "outline"}
+                    className="cursor-pointer hover:bg-accent transition-colors py-1 text-left h-auto whitespace-normal"
+                    onClick={() => toggleShot(opt.id)}
+                  >
+                    <span className="font-mono text-[10px]">{opt.id}</span>
+                    <span className="sr-only"> — {opt.label}</span>
+                  </Badge>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
         {state.selected.length > 0 && (
-          <p className="text-[10px] text-text-muted italic">
-            Seleccionados: {state.selected.join(", ")}
+          <p className="text-[10px] text-text-muted italic mt-3">
+            Seleccionados:{" "}
+            {state.selected
+              .map((id) => SHOT_CATALOG.find((s) => s.id === id)?.label ?? id)
+              .join(", ")}
           </p>
         )}
-      </div>
-    );
+      </ScrollArea>
+    )
   },
 
   toPromptFragment: (state) => {
-    if (state.selected.length === 0) return "";
-    return `[CINEMATOGRAPHY] Use these camera shots: ${state.selected.join(", ")}.`;
+    if (state.selected.length === 0) return ""
+    const labels = state.selected
+      .map((id) => SHOT_CATALOG.find((s) => s.id === id)?.label ?? id)
+      .join(", ")
+    return `[CINEMATOGRAPHY]\nShot plan: ${labels}.`
   },
-};
+}

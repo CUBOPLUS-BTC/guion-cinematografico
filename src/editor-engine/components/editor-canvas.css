@@ -4,7 +4,7 @@
   font-family: var(--font-screenplay, "Courier Prime", "Courier New", monospace);
   font-size: 12pt;
   line-height: normal;
-  color: black;
+  color: var(--color-fountain-action, #111);
   width: 8.5in;
   min-height: 11in;
   margin: 0 auto;
@@ -19,11 +19,13 @@
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   font-weight: bold;
+  color: var(--color-fountain-scene, #0d5c4a);
 }
 
 .fountain-action {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+  color: var(--color-fountain-action, #111);
 }
 
 .fountain-character {
@@ -31,18 +33,21 @@
   margin-left: 2.2in; /* Measured from 1.5in base margin */
   text-transform: uppercase;
   margin-top: 1rem;
+  color: var(--color-fountain-character, #4a6fa5);
 }
 
 .fountain-parenthetical {
   width: 50%;
   margin-left: 1.6in;
   font-style: italic;
+  color: var(--color-fountain-parenthetical, #6b5b8c);
 }
 
 .fountain-dialogue {
   width: 70%;
   margin-left: 1in;
   margin-bottom: 0.5rem;
+  color: var(--color-fountain-dialogue, #222);
 }
 
 .fountain-transition {
@@ -50,6 +55,7 @@
   text-transform: uppercase;
   margin-top: 1rem;
   margin-bottom: 1rem;
+  color: var(--color-fountain-transition, #8b3a2f);
 }
 
 /* TipTap Specifics */

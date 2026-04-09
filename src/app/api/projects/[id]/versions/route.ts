@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth/auth"
+import { prisma } from "@/lib/prisma"
 import { getOwnedProjectOrNull } from "@/lib/api/project-access"
 
 type RouteContext = { params: Promise<{ id: string }> }
@@ -13,39 +13,49 @@ export async function GET(_request: Request, context: RouteContext) {
 
   const { id } = await context.params
   const project = await getOwnedProjectOrNull(id, session.user.id)
-
   if (!project) {
     return NextResponse.json({ error: "Proyecto no encontrado" }, { status: 404 })
   }
 
-  return NextResponse.json(project.content)
+  const versions = await prisma.version.findMany({
+    where: { projectId: id },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      label: true,
+      createdAt: true,
+    },
+  })
+
+  return NextResponse.json({ versions })
 }
 
-export async function PUT(request: Request, context: RouteContext) {
+export async function POST(request: Request, context: RouteContext) {
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
 
   const { id } = await context.params
-  const existing = await getOwnedProjectOrNull(id, session.user.id)
-  if (!existing) {
+  const project = await getOwnedProjectOrNull(id, session.user.id)
+  if (!project) {
     return NextResponse.json({ error: "Proyecto no encontrado" }, { status: 404 })
   }
 
+  let body: { label?: string; content?: unknown } = {}
   try {
-    const body = await request.json()
-
-    const project = await prisma.project.update({
-      where: { id },
-      data: {
-        content: body,
-        updatedAt: new Date(),
-      },
-    })
-
-    return NextResponse.json({ success: true, updatedAt: project.updatedAt })
+    body = await request.json()
   } catch {
-    return NextResponse.json({ error: "Error al guardar contenido" }, { status: 500 })
+    body = {}
   }
+
+  const version = await prisma.version.create({
+    data: {
+      projectId: id,
+      content: (body.content ?? project.content) as object,
+      label: body.label?.trim() || "Snapshot",
+    },
+  })
+
+  return NextResponse.json(version, { status: 201 })
 }

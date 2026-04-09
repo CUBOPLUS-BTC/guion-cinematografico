@@ -3,13 +3,13 @@ import { pluginRegistry } from "../plugins/registry";
 
 interface PluginStoreState {
   /** Estados de datos de cada plugin { shots: { selected: [...] }, lighting: { key: 'low-key' } } */
-  states: Record<string, any>;
+  states: Record<string, Record<string, unknown>>;
   
   /** IDs de plugins activos para envío a la IA */
   activePlugins: string[];
   
   /** Actualizar estado de un plugin específico */
-  updatePluginState: (pluginId: string, partial: any) => void;
+  updatePluginState: (pluginId: string, partial: Record<string, unknown>) => void;
   
   /** Activar/desactivar plugin */
   togglePlugin: (pluginId: string) => void;
@@ -27,7 +27,9 @@ export const usePluginStore = create<PluginStoreState>((set, get) => ({
       states: {
         ...state.states,
         [pluginId]: {
-          ...(state.states[pluginId] || pluginRegistry.get(pluginId)?.defaultState || {}),
+          ...((state.states[pluginId] ??
+            (pluginRegistry.get(pluginId)?.defaultState as Record<string, unknown> | undefined) ??
+            {}) as Record<string, unknown>),
           ...partial,
         },
       },
@@ -47,7 +49,7 @@ export const usePluginStore = create<PluginStoreState>((set, get) => ({
 
   getAIModifiers: () => {
     const { states, activePlugins } = get();
-    const activeStates: Record<string, any> = {};
+    const activeStates: Record<string, Record<string, unknown>> = {};
     
     activePlugins.forEach(id => {
       if (states[id]) activeStates[id] = states[id];

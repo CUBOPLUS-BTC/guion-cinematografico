@@ -2,6 +2,7 @@ import React from "react";
 
 export type PluginCategory = 'cinematography' | 'audio' | 'visual' | 'narrative';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- plugins heterogéneos por diseño
 export interface PluginDefinition<T = any> {
   id: string;
   name: string;
@@ -19,7 +20,7 @@ export interface PluginDefinition<T = any> {
   
   // Generadores de prompts y metadata
   toPromptFragment: (state: T) => string;
-  toDocumentMetadata?: (state: T) => Record<string, any>;
+  toDocumentMetadata?: (state: T) => Record<string, unknown>;
 }
 
 export interface PluginAIContext {

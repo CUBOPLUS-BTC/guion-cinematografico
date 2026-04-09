@@ -13,7 +13,5 @@ export function initializePlugins() {
   pluginRegistry.register(LightingPlugin);
   pluginRegistry.register(CameraPlugin);
   pluginRegistry.register(EffectsPlugin);
-  pluginRegistry.register(DescriptionPlugin);
-  
-  console.log("Plugins cargados:", pluginRegistry.getAll().map(p => p.id));
+  pluginRegistry.register(DescriptionPlugin)
 }

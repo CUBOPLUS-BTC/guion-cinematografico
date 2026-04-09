@@ -1,6 +1,5 @@
 import React from "react";
 import { PluginDefinition } from "../types";
-import { Sparkles } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -71,8 +70,12 @@ export const EffectsPlugin: PluginDefinition<EffectsState> = {
   },
 
   toPromptFragment: (state) => {
-    const activeVfx = Object.entries(state.vfx).filter(([_, v]) => v).map(([k]) => k);
-    const activeSfx = Object.entries(state.sfx).filter(([_, v]) => v).map(([k]) => k);
+    const activeVfx = Object.entries(state.vfx)
+      .filter(([, v]) => v)
+      .map(([k]) => k)
+    const activeSfx = Object.entries(state.sfx)
+      .filter(([, v]) => v)
+      .map(([k]) => k)
     
     if (activeVfx.length === 0 && activeSfx.length === 0) return "";
     

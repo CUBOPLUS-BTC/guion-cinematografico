@@ -37,13 +37,13 @@ class PluginRegistry {
   /**
    * Construye un prompt combinado basado en el estado actual de los plugins.
    */
-  public buildCombinedPrompt(states: Record<string, any>): string {
+  public buildCombinedPrompt(states: Record<string, unknown>): string {
     let combined = "";
     
     for (const [id, state] of Object.entries(states)) {
       const plugin = this.get(id);
       if (plugin && state) {
-        const fragment = plugin.toPromptFragment(state);
+        const fragment = plugin.toPromptFragment(state as never);
         if (fragment) {
           combined += `\n${fragment}`;
         }
