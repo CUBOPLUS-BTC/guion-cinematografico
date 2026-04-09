@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import type { ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -18,6 +19,8 @@ export type EditorHeaderProps = {
   sceneCount: number
   onExportPdf: () => void | Promise<void>
   onExportFdx: () => void | Promise<void>
+  /** Acciones extra antes del menú Exportar (p. ej. Generar prompts de video). */
+  toolbarExtra?: ReactNode
 }
 
 export function EditorHeader({
@@ -27,6 +30,7 @@ export function EditorHeader({
   sceneCount,
   onExportPdf,
   onExportFdx,
+  toolbarExtra,
 }: EditorHeaderProps) {
   const toggleChat = useUIStore((s) => s.toggleChat)
   const toggleModifiers = useUIStore((s) => s.toggleModifiers)
@@ -77,6 +81,8 @@ export function EditorHeader({
           <span>{wordCount} Pal</span>
           <span>{sceneCount} Esc</span>
         </div>
+
+        {toolbarExtra}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

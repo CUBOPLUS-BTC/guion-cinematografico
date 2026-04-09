@@ -218,3 +218,66 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 }
+
+/* Landing: atmósfera y motion (usa tokens del proyecto) */
+@keyframes landing-cursor-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes landing-grain {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1%, 1%);
+  }
+  50% {
+    transform: translate(1%, -0.5%);
+  }
+  75% {
+    transform: translate(-0.5%, -1%);
+  }
+}
+
+.landing-hero-mesh {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 10% 0%, oklch(0.75 0.14 75 / 0.18), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 90% 15%, oklch(0.55 0.12 240 / 0.12), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, oklch(0.65 0.08 155 / 0.1), transparent 45%);
+}
+
+.dark .landing-hero-mesh {
+  background-image:
+    radial-gradient(ellipse 120% 80% at 10% 0%, oklch(0.55 0.12 75 / 0.35), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 90% 15%, oklch(0.45 0.1 240 / 0.2), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, oklch(0.4 0.06 155 / 0.15), transparent 45%);
+}
+
+.landing-grain {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  animation: landing-grain 8s steps(4) infinite;
+  mix-blend-mode: overlay;
+}
+
+.landing-cursor {
+  display: inline-block;
+  width: 0.12em;
+  margin-left: 1px;
+  height: 1em;
+  background: var(--accent);
+  animation: landing-cursor-blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}

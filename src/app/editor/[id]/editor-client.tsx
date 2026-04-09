@@ -7,6 +7,7 @@ import { EditorHeader } from "@/editor-engine/components/editor-header"
 import { EditorLayout } from "@/editor-engine/components/editor-layout"
 import { ModifiersPanel } from "@/editor-engine/components/modifiers-panel"
 import { PreviewPanel } from "@/editor-engine/components/preview-panel"
+import { GenerateVideoPromptsDialog } from "@/editor-engine/components/generate-video-prompts-dialog"
 import { useEditorStore } from "@/editor-engine/store/editor-store"
 import { useProjectStore } from "@/editor-engine/store/project-store"
 import { useChatStore } from "@/editor-engine/store/chat-store"
@@ -118,6 +119,7 @@ export function EditorClient({
           sceneCount={stats.sceneCount}
           onExportPdf={() => void handleExport("pdf")}
           onExportFdx={() => void handleExport("fdx")}
+          toolbarExtra={<GenerateVideoPromptsDialog projectId={projectId} />}
         />
 
         <div className="flex-1 flex flex-col min-h-0 min-w-0">

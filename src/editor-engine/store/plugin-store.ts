@@ -39,10 +39,25 @@ export const usePluginStore = create<PluginStoreState>((set, get) => ({
   togglePlugin: (pluginId) => {
     set((state) => {
       const active = state.activePlugins.includes(pluginId);
+      if (active) {
+        return {
+          activePlugins: state.activePlugins.filter((id) => id !== pluginId),
+        };
+      }
+      const def = pluginRegistry.get(pluginId)?.defaultState as
+        | Record<string, unknown>
+        | undefined;
       return {
-        activePlugins: active
-          ? state.activePlugins.filter(id => id !== pluginId)
-          : [...state.activePlugins, pluginId]
+        activePlugins: [...state.activePlugins, pluginId],
+        states: def
+          ? {
+              ...state.states,
+              [pluginId]: {
+                ...(state.states[pluginId] ?? {}),
+                ...def,
+              },
+            }
+          : state.states,
       };
     });
   },
