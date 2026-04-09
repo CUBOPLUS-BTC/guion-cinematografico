@@ -8,7 +8,6 @@ import { useEditorChat } from "@/editor-engine/components/chat-context"
 import { ScreenplayBlockEditor } from "@/editor-engine/components/screenplay-block-editor"
 import { getTextFromUIMessage } from "@/editor-engine/utils/ui-message-text"
 
-/** Vista central: streaming con Streamdown mientras genera; luego editor de bloques del guion Fountain. */
 export function PreviewPanel() {
   const { messages, status, busy } = useEditorChat()
   const scrollAnchorRef = useRef<HTMLDivElement>(null)
@@ -16,8 +15,7 @@ export function PreviewPanel() {
   const assistantMessages = messages.filter((m) => m.role === "assistant")
   const lastAssistant = assistantMessages.at(-1)
   const streamText = lastAssistant ? getTextFromUIMessage(lastAssistant) : ""
-  const isStreamingAssistant =
-    busy && lastAssistant && assistantMessages.length > 0
+  const isStreamingAssistant = busy && lastAssistant && assistantMessages.length > 0
 
   useEffect(() => {
     scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -26,43 +24,40 @@ export function PreviewPanel() {
   if (isStreamingAssistant) {
     return (
       <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
-        <div className="flex-1 min-h-0 overflow-auto">
-          <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-4">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-accent">
+        <div className="flex-1 min-h-0 overflow-auto px-4 py-8">
+          {/* Página de streaming */}
+          <div className="max-w-[680px] mx-auto">
+            <div className="flex items-center gap-2 mb-4 text-xs font-semibold text-accent uppercase tracking-widest">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
               Generando guion…
-            </p>
+            </div>
             <div
-              className="w-full max-w-full rounded-md bg-bg-canvas text-zinc-900 dark:text-text-primary shadow-lg border border-zinc-200/80 dark:border-accent-muted px-6 py-8 md:px-10 md:py-10"
-              style={{
-                fontFamily: "var(--font-screenplay), Courier New, monospace",
-                fontSize: "12pt",
-                lineHeight: 1.05,
-              }}
+              className="bg-white dark:bg-[#1a1a1e] rounded-xl shadow-xl border border-gray-200/60 dark:border-white/8 px-10 py-10"
+              style={{ fontFamily: "'Courier Prime', 'Courier New', monospace", fontSize: "13px", lineHeight: 1.6 }}
             >
-              <Streamdown
-                plugins={{ code }}
-                mode={undefined}
-                isAnimating
-                className="screenplay-streamdown text-zinc-900 dark:text-text-primary [&_pre]:bg-zinc-100 dark:[&_pre]:bg-bg-tertiary [&_code]:text-zinc-800 dark:[&_code]:text-text-secondary"
-              >
+              <Streamdown plugins={{ code }} mode={undefined} isAnimating className="text-gray-900 dark:text-gray-100">
                 {streamText}
               </Streamdown>
             </div>
-            <div className="flex items-center gap-2 text-xs text-accent px-1">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Generando…
-            </div>
-            <div ref={scrollAnchorRef} className="h-px" aria-hidden />
           </div>
+          <div ref={scrollAnchorRef} className="h-px" aria-hidden />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-bg-primary">
-      <ScreenplayBlockEditor disabled={false} />
-      <div ref={scrollAnchorRef} className="h-px shrink-0" aria-hidden />
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-[#f6f5f3] dark:bg-[#111114]">
+      {/* Área de "página" centrada */}
+      <div className="flex-1 min-h-0 overflow-auto py-8 px-4">
+        <div className="max-w-[700px] mx-auto">
+          {/* Hoja de guion */}
+          <div className="bg-white dark:bg-[#1c1c21] rounded-xl shadow-lg border border-gray-200/60 dark:border-white/6 px-8 py-10 md:px-12 md:py-12 min-h-[500px]">
+            <ScreenplayBlockEditor disabled={false} />
+          </div>
+        </div>
+        <div ref={scrollAnchorRef} className="h-4" aria-hidden />
+      </div>
     </div>
   )
 }

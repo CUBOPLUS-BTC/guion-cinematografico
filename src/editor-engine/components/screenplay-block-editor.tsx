@@ -56,13 +56,12 @@ export function ScreenplayBlockEditor({ disabled }: { disabled?: boolean }) {
 
   if (blocks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-0 px-8 py-16 text-center select-none">
-        <div className="mb-4 text-4xl opacity-30">🎬</div>
-        <p className="text-base font-semibold text-text-muted mb-2">
-          Tu guion está vacío
-        </p>
-        <p className="text-sm text-text-muted opacity-70 max-w-sm leading-relaxed">
-          Escribe una instrucción en el panel izquierdo y presiona <span className="font-semibold">Generar</span> para que la IA construya tu guion, o escribe directo usando los botones de acción rápida.
+      <div className="flex flex-col items-center justify-center h-full min-h-[320px] px-8 py-16 text-center select-none">
+        <div className="text-5xl mb-5 opacity-20">🎬</div>
+        <p className="text-sm font-semibold text-text-muted mb-2">Página en blanco</p>
+        <p className="text-xs text-text-muted opacity-60 max-w-xs leading-relaxed">
+          Usa el panel izquierdo para dar instrucciones a la IA.
+          Presiona <span className="font-semibold text-accent">Generar</span> para crear tu guion.
         </p>
       </div>
     )
@@ -70,7 +69,7 @@ export function ScreenplayBlockEditor({ disabled }: { disabled?: boolean }) {
 
   return (
     <ScrollArea className="flex-1 min-h-0">
-      <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-3 pb-10">
+      <div className="space-y-1 pb-6">
         {blocks.map((block) => (
           <ScreenplayBlock
             key={block.id}
