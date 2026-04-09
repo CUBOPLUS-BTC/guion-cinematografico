@@ -58,7 +58,7 @@ export function ChatProvider({
   const setPendingAction = useChatStore((s) => s.setPendingAction)
   const documentFountain = useChatStore((s) => s.documentFountain)
   const updateStatsFromFountain = useEditorStore((s) => s.updateStatsFromFountain)
-  const [activeModel, setActiveModel] = useState<string>("meta-llama/llama-3.3-70b-instruct:free")
+  const [activeModel, setActiveModel] = useState<string>("openai/gpt-oss-20b:free")
   const activeModelRef = useRef(activeModel)
 
   const transport = useMemo(

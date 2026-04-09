@@ -48,10 +48,13 @@ export async function GET() {
       }>
     }
 
-    // Filtrar solo modelos text->text (chat completions)
+    // Filtrar solo modelos text->text (chat completions), excluir audio/imagen/embedding
     const textModels = data.data.filter((m) => {
       const modality = m.architecture?.modality ?? ""
-      return modality.includes("text->text") || modality === ""
+      const id = m.id.toLowerCase()
+      // Excluir modelos de audio, imagen, embedding, TTS
+      if (id.includes("lyria") || id.includes("whisper") || id.includes("tts") || id.includes("embed")) return false
+      return modality === "text->text" || modality === "" || modality.includes("text->text")
     })
 
     const models: ModelInfo[] = textModels.map((m) => {

@@ -141,22 +141,7 @@ export async function POST(req: Request, context: RouteContext) {
       )
     }
 
-    // Verificar estado de la key antes de llamar al modelo
-    const keyCheck = await fetch("https://openrouter.ai/api/v1/auth/key", {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    }).then((r) => r.json()).catch(() => null) as { data?: { limit_remaining?: number; is_free_tier?: boolean } } | null
 
-    const limitRemaining = keyCheck?.data?.limit_remaining ?? null
-    const isFreeTier = keyCheck?.data?.is_free_tier ?? false
-
-    if (isFreeTier && limitRemaining !== null && limitRemaining <= 0) {
-      return new Response(
-        JSON.stringify({
-          error: "⚠️ Sin créditos disponibles en OpenRouter. Agrega créditos en https://openrouter.ai/settings/credits para usar modelos de paga, o espera a que se reinicien los límites gratuitos.",
-        }),
-        { status: 402, headers: { "Content-Type": "application/json" } }
-      )
-    }
 
     const { id: projectId } = await context.params
     const project = await getOwnedProjectOrNull(projectId, session.user.id)

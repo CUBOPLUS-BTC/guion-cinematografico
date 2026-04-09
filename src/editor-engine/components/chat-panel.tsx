@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 import type { ModelInfo } from "@/app/api/models/route"
 
-export const DEFAULT_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+export const DEFAULT_MODEL = "openai/gpt-oss-20b:free"
 
 export type ChatPanelProps = {
   compact?: boolean
