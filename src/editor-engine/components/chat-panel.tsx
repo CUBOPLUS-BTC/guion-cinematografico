@@ -24,41 +24,41 @@ import {
 
 // ─── Modelos disponibles ──────────────────────────────────────────────────────
 export const AI_MODELS = [
-  // GRATUITOS — soportan system prompt
-  {
-    id: "meta-llama/llama-3.1-8b-instruct:free",
-    label: "Llama 3.1 8B",
-    provider: "Meta",
-    tier: "free" as const,
-    note: "Recomendado gratis",
-  },
+  // GRATUITOS — verificados en OpenRouter
   {
     id: "meta-llama/llama-3.3-70b-instruct:free",
     label: "Llama 3.3 70B",
     provider: "Meta",
     tier: "free" as const,
-    note: "Alta calidad, gratis",
+    note: "⭐ Recomendado gratis",
   },
   {
-    id: "mistralai/mistral-7b-instruct:free",
-    label: "Mistral 7B",
-    provider: "Mistral",
+    id: "meta-llama/llama-3.2-3b-instruct:free",
+    label: "Llama 3.2 3B",
+    provider: "Meta",
     tier: "free" as const,
-    note: "Fluido y creativo",
+    note: "Ligero y rápido",
   },
   {
-    id: "qwen/qwen-2.5-72b-instruct:free",
-    label: "Qwen 2.5 72B",
+    id: "nousresearch/hermes-3-llama-3.1-405b:free",
+    label: "Hermes 3 405B",
+    provider: "NousResearch",
+    tier: "free" as const,
+    note: "Muy potente, gratis",
+  },
+  {
+    id: "qwen/qwen3-next-80b-a3b-instruct:free",
+    label: "Qwen3 80B",
     provider: "Alibaba",
     tier: "free" as const,
-    note: "Muy capaz, gratis",
+    note: "Alta calidad",
   },
   {
-    id: "deepseek/deepseek-chat-v3-0324:free",
-    label: "DeepSeek V3",
-    provider: "DeepSeek",
+    id: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+    label: "Dolphin Mistral 24B",
+    provider: "CogComp",
     tier: "free" as const,
-    note: "Excelente calidad",
+    note: "Creativo y fluido",
   },
   // DE PAGA
   {
@@ -98,7 +98,7 @@ export const AI_MODELS = [
   },
 ]
 
-export const DEFAULT_MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+export const DEFAULT_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 
 export type ChatPanelProps = {
   compact?: boolean
