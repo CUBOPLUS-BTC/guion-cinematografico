@@ -16,13 +16,13 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 md:space-y-8 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-text-primary">Mis Proyectos</h1>
-          <p className="text-text-muted">Gestiona y escribe tus guiones cinematográficos.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-primary">Mis Proyectos</h1>
+          <p className="text-sm md:text-base text-text-muted">Gestiona y escribe tus guiones cinematográficos.</p>
         </div>
-        <CreateProjectButton className="bg-accent hover:bg-accent/90 text-white gap-2" />
+        <CreateProjectButton className="bg-accent w-full sm:w-auto hover:bg-accent/90 text-white gap-2" />
       </div>
 
       {projects.length === 0 ? (

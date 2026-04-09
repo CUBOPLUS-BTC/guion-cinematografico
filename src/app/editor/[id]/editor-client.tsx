@@ -81,27 +81,27 @@ export function EditorClient({
   return (
     <div className="h-screen w-full flex flex-col bg-bg-primary overflow-hidden">
       <AICommandMenu />
-      <header className="h-12 border-b border-accent-muted bg-bg-secondary flex items-center px-4 justify-between">
-        <div className="flex items-center gap-4 text-sm">
-          <Link href="/dashboard" className="text-accent font-bold hover:underline">
-            ← DASHBOARD
+      <header className="h-auto min-h-12 py-2 md:py-0 md:h-12 border-b border-accent-muted bg-bg-secondary flex flex-wrap items-center px-4 justify-between gap-2">
+        <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm w-full md:w-auto">
+          <Link href="/dashboard" className="text-accent font-bold hover:underline shrink-0">
+            ← <span className="hidden md:inline">DASHBOARD</span>
           </Link>
-          <div className="h-4 w-px bg-accent-muted" />
-          <h2 className="font-medium text-text-primary truncate max-w-[40vw]">
+          <div className="h-4 w-px bg-accent-muted hidden md:block" />
+          <h2 className="font-medium text-text-primary truncate max-w-[50vw]">
             Proyecto: {initialTitle}
           </h2>
-          <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-text-muted ml-4">
+          <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-text-muted ml-auto md:ml-4 shrink-0">
             <div
               className={`size-1.5 rounded-full ${isDirty ? "bg-amber-500 animate-pulse" : "bg-green-500"}`}
             />
-            <span>{isDirty ? "Guardando..." : "Sincronizado"}</span>
+            <span className="hidden sm:inline">{isDirty ? "Guardando..." : "Sincronizado"}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-4 mr-4 text-[10px] text-text-muted uppercase font-bold tracking-widest">
-            <span>{stats.wordCount} Palabras</span>
-            <span>{stats.sceneCount} Escenas</span>
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-2 md:gap-4 mr-2 md:mr-4 text-[9px] md:text-[10px] text-text-muted uppercase font-bold tracking-widest">
+            <span>{stats.wordCount} Pal</span>
+            <span>{stats.sceneCount} Esc</span>
           </div>
 
           <DropdownMenu>
@@ -109,10 +109,10 @@ export function EditorClient({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 border-accent-muted text-xs gap-2"
+                className="h-7 text-[10px] md:h-8 md:text-xs border-accent-muted gap-2"
               >
                 <Download className="h-3 w-3" />
-                Exportar
+                <span className="hidden sm:inline">Exportar</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-bg-secondary border-accent-muted">
@@ -133,21 +133,21 @@ export function EditorClient({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button size="sm" className="h-8 bg-accent text-white text-xs px-4">
+          <Button size="sm" className="h-7 text-[10px] md:h-8 bg-accent text-white md:text-xs px-3 md:px-4">
             Compartir
           </Button>
         </div>
       </header>
 
-      <div className="flex-1">
-        <ResizablePanelGroup orientation="horizontal">
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal">
           {outlineOpen && (
             <>
               <ResizablePanel
                 defaultSize={15}
                 minSize={10}
                 maxSize={25}
-                className="bg-bg-secondary"
+                className="bg-bg-secondary hidden md:block" // Hidden on mobile
               >
                 <div className="p-4 h-full">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">
@@ -160,21 +160,21 @@ export function EditorClient({
                   </div>
                 </div>
               </ResizablePanel>
-              <ResizableHandle withHandle className="bg-accent-muted" />
+              <ResizableHandle withHandle className="bg-accent-muted hidden md:flex" />
             </>
           )}
 
           <ResizablePanel
             defaultSize={pluginsOpen ? 60 : 85}
-            className="bg-bg-primary relative overflow-hidden flex flex-col"
+            className="bg-bg-primary relative overflow-hidden flex flex-col min-w-0"
           >
             <EditorCanvas projectId={projectId} initialContent={initialContent} />
           </ResizablePanel>
 
           {pluginsOpen && (
             <>
-              <ResizableHandle withHandle className="bg-accent-muted" />
-              <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+              <ResizableHandle withHandle className="bg-accent-muted hidden md:flex" />
+              <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="hidden md:block">
                 <PluginsPanel />
               </ResizablePanel>
             </>
