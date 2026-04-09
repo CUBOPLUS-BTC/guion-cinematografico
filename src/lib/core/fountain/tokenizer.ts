@@ -3,7 +3,7 @@ import { FountainElement, FountainElementType } from "@/types/fountain";
 export class FountainTokenizer {
   private static readonly SCENE_HEADING_REGEX = /^(INT|EXT|EST|I\/E|INT\.?\/EXT\.?|INT\.|EXT\.)[\s\.]/i;
   private static readonly TRANSITION_REGEX = /^(.*TO:)$|^(>.*)$/;
-  private static readonly CHARACTER_REGEX = /^[A-Z0-9\s\(\)\d]+(\s\^)?$/;
+  private static readonly CHARACTER_REGEX = /^[A-ZÁÉÍÓÚÜÑ0-9\s\(\)\d]+(\s\^)?$/;
   private static readonly PARENTHETICAL_REGEX = /^\(.*\)$/;
 
   /**

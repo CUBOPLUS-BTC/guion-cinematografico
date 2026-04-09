@@ -52,7 +52,7 @@ function parseTimeFromLine(line: string): string {
 const SCENE_HEADING_REGEX =
   /^(INT|EXT|EST|I\/E|INT\.?\/EXT\.?|INT\.|EXT\.)[\s\.]/i
 const TRANSITION_REGEX = /^(.*TO:)$|^(>.*)$/
-const CHARACTER_REGEX = /^[A-Z0-9\s\(\)\d]+(\s\^)?$/
+const CHARACTER_REGEX = /^[A-ZÁÉÍÓÚÜÑ0-9\s\(\)\d]+(\s\^)?$/
 const PARENTHETICAL_REGEX = /^\(.*\)$/
 
 /**

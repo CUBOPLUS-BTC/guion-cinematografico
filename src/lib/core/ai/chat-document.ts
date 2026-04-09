@@ -56,6 +56,14 @@ function sanitize(text: string): string {
     if (!t) { result.push(""); continue }
     if (/^(aquí (está|tienes|te)|espero|claro,|por supuesto|a continuación|este es|el guion (es|completo)|nota[: ])/i.test(t)) continue
 
+    // Convertir [TRANSICIÓN] > CORTE A: → > CORTE A:
+    const transMatch = t.match(/^\[TRANSICI[ÓO]N\]\s*(.*)/i)
+    if (transMatch) {
+      const trans = transMatch[1].trim()
+      if (trans) result.push(trans.startsWith('>') ? trans : `> ${trans.toUpperCase()}`)
+      continue
+    }
+
     result.push(line.trimEnd())
   }
 

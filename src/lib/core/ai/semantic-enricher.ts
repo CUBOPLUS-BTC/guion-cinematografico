@@ -50,7 +50,7 @@ function isStructuralLine(line: string): boolean {
   return (
     /^(INT\.|EXT\.|EST\.)/i.test(t) ||  // scene heading
     /^\[\[/.test(t) ||                    // timing note
-    /^[A-ZÁÉÍÓÚ\s]{3,}$/.test(t) ||     // character name (all caps)
+    /^[A-ZÁÉÍÓÚÜÑ0-9\s\(\)]{3,}$/.test(t) ||     // character name (all caps)
     /^\(/.test(t) ||                      // parenthetical
     /^>/.test(t) ||                       // transition
     /^#/.test(t) ||                       // section
