@@ -124,32 +124,39 @@ export default function SignupPage() {
           </Button>
         </form>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-accent-muted"></div>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-bg-secondary px-2 text-text-muted">O regístrate con</span>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <Button
-            type="button"
-            className="w-full bg-white text-gray-900 hover:bg-gray-100"
-            onClick={() => void signIn("google", { callbackUrl: "/dashboard" })}
-          >
-            Google
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-accent-muted"
-            onClick={() => void signIn("github", { callbackUrl: "/dashboard" })}
-          >
-            GitHub
-          </Button>
-        </div>
+        {(!!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED || !!process.env.NEXT_PUBLIC_AUTH_GITHUB_ENABLED) && (
+          <>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-accent-muted"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-bg-secondary px-2 text-text-muted">O regístrate con</span>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {!!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED && (
+                <Button
+                  type="button"
+                  className="w-full bg-white text-gray-900 hover:bg-gray-100"
+                  onClick={() => void signIn("google", { callbackUrl: "/dashboard" })}
+                >
+                  Google
+                </Button>
+              )}
+              {!!process.env.NEXT_PUBLIC_AUTH_GITHUB_ENABLED && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-accent-muted"
+                  onClick={() => void signIn("github", { callbackUrl: "/dashboard" })}
+                >
+                  GitHub
+                </Button>
+              )}
+            </div>
+          </>
+        )}
 
         <p className="text-center text-xs text-text-muted">
           ¿Ya tienes cuenta?{" "}
