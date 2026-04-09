@@ -6,6 +6,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { EditorCanvas } from "@/editor-engine/components/editor-canvas"
+import { AICommandMenu } from "@/editor-engine/components/ai-command-menu"
 import { useUIStore } from "@/editor-engine/store/ui-store"
 import { useEditorStore } from "@/editor-engine/store/editor-store"
 
@@ -15,6 +16,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="h-screen w-full flex flex-col bg-bg-primary overflow-hidden">
+      <AICommandMenu />
       {/* Top Toolbar */}
       <header className="h-12 border-b border-accent-muted bg-bg-secondary flex items-center px-4 justify-between">
         <div className="flex items-center gap-4 text-sm">
