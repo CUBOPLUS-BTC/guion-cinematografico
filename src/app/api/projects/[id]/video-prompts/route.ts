@@ -40,6 +40,68 @@ type SceneAccumulator = {
   music: string[]
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
+}
+
+function parseDurationToSeconds(value: string): number | null {
+  const normalized = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+
+  const clockMatch = normalized.match(/\b(\d{1,2}):(\d{2})\b/)
+  if (clockMatch) {
+    const minutes = Number(clockMatch[1])
+    const seconds = Number(clockMatch[2])
+    if (Number.isFinite(minutes) && Number.isFinite(seconds)) {
+      return minutes * 60 + seconds
+    }
+  }
+
+  let totalSeconds = 0
+  let matched = false
+
+  for (const match of normalized.matchAll(/(\d+(?:[.,]\d+)?)\s*(m|min|mins|minuto|minutos)\b/g)) {
+    totalSeconds += Number(match[1].replace(",", ".")) * 60
+    matched = true
+  }
+
+  for (const match of normalized.matchAll(/(\d+(?:[.,]\d+)?)\s*(s|seg|segs|segundo|segundos)\b/g)) {
+    totalSeconds += Number(match[1].replace(",", "."))
+    matched = true
+  }
+
+  if (matched) {
+    return Math.round(totalSeconds)
+  }
+
+  const looseNumber = normalized.match(/\d+(?:[.,]\d+)?/)
+  if (!looseNumber) return null
+
+  return Math.round(Number(looseNumber[0].replace(",", ".")))
+}
+
+function getDefaultDurationSeconds(seed: number): number {
+  const values = [8, 10, 12, 14, 15]
+  return values[seed % values.length]
+}
+
+function normalizePromptDuration(duration: string | undefined, seed: number): string {
+  const parsed = duration ? parseDurationToSeconds(duration) : null
+  const seconds = clamp(parsed ?? getDefaultDurationSeconds(seed), 8, 15)
+  return `${seconds} s`
+}
+
+function normalizeVideoPrompts(prompts: VideoPrompt[]): VideoPrompt[] {
+  return prompts.map((prompt, index) => ({
+    ...prompt,
+    sceneHeading:
+      prompt.sceneHeading.trim() || `ESCENA ${prompt.sceneNumber || index + 1}`,
+    duration: normalizePromptDuration(prompt.duration, index),
+  }))
+}
+
 function truncateText(value: string, maxLength: number): string {
   const trimmed = value.replace(/\s+/g, " ").trim()
   if (trimmed.length <= maxLength) return trimmed
@@ -123,7 +185,7 @@ function buildPromptFromScene(
     sceneNumber: scene.sceneNumber,
     sceneHeading: scene.sceneHeading,
     prompt,
-    duration: scene.duration,
+    duration: normalizePromptDuration(scene.duration, scene.sceneNumber - 1),
     notes: notesParts.length > 0 ? notesParts.join(" · ") : undefined,
   }
 }
@@ -246,7 +308,7 @@ export async function POST(req: Request, context: RouteContext) {
       )
     }
 
-    const fallbackPrompts = buildFallbackVideoPrompts(fountain)
+    const fallbackPrompts = normalizeVideoPrompts(buildFallbackVideoPrompts(fountain))
     const apiKey = process.env.OPENROUTER_API_KEY
     if (!apiKey?.trim()) {
       return Response.json({ prompts: fallbackPrompts, model: "fallback/local" })
@@ -272,8 +334,11 @@ Cada prompt debe incluir de forma explícita cuando aplique:
 - Encuadre / movimiento de cámara sugerido
 - Iluminación y ambiente
 - Coherencia con la escena anterior (mencionar continuidad si es relevante)
+- duration obligatoria y SIEMPRE entre 8 y 15 segundos. Nunca devuelvas 20 segundos o más.
 
 Los prompts deben ser secuenciales (sceneNumber 1, 2, 3…) según el orden del guion. sceneHeading debe resumir el encabezado de escena o inventar un título corto si falta.
+Cada prompt representa un único beat visual breve, pensado para una toma o fragmento de 8 a 15 segundos.
+Si una escena necesita más tiempo, divídela en varios prompts consecutivos para esa misma escena y distingue cada uno con un sufijo breve en sceneHeading, por ejemplo: "INT. CASA - NOCHE · Beat 1".
 
 Responde SOLO mediante el objeto JSON que cumple el schema; no añadas texto fuera del JSON.`,
         prompt: `Título del proyecto: ${project.title || "Sin título"}
@@ -283,11 +348,11 @@ Guion Fountain completo:
 ${fountain}
 ---
 
-Genera el array "prompts" con un elemento por escena relevante del guion.`,
+Genera el array "prompts" con uno o varios elementos por escena cuando haga falta, pero cada elemento debe cubrir solo entre 8 y 15 segundos de video.`,
         temperature: 0.6,
       })
 
-      return Response.json({ prompts: object.prompts, model: modelId })
+      return Response.json({ prompts: normalizeVideoPrompts(object.prompts), model: modelId })
     } catch (generationError) {
       console.error("Video prompts structured generation error:", generationError)
 
