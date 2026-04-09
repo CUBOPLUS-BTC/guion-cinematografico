@@ -1,42 +1,35 @@
-import { create } from "zustand";
-import { Editor } from "@tiptap/react";
+import { create } from "zustand"
+import { FountainParser } from "@/lib/core/fountain/parser"
 
 interface EditorStats {
   pageCount: number
   wordCount: number
   sceneCount: number
   characterNames: string[]
-  /** Regla aprox.: 1 página ≈ 250 palabras ≈ 1 min */
   estimatedDuration: string
 }
 
 interface EditorState {
-  editor: Editor | null;
-  setEditor: (editor: Editor | null) => void;
-  
-  isDirty: boolean;
-  lastSavedAt: Date | null;
-  markDirty: () => void;
-  markClean: () => void;
-  
-  stats: EditorStats;
-  updateStats: () => void;
-  
-  zoom: number;
-  setZoom: (zoom: number) => void;
-  
-  outline: unknown[] // List of scene headings for navigation
+  isDirty: boolean
+  lastSavedAt: Date | null
+  markDirty: () => void
+  markClean: () => void
+
+  stats: EditorStats
+  updateStatsFromFountain: (fountainText: string) => void
+
+  zoom: number
+  setZoom: (zoom: number) => void
+
+  outline: unknown[]
 }
 
-export const useEditorStore = create<EditorState>((set, get) => ({
-  editor: null,
-  setEditor: (editor) => set({ editor }),
-  
+export const useEditorStore = create<EditorState>((set) => ({
   isDirty: false,
   lastSavedAt: null,
   markDirty: () => set({ isDirty: true }),
   markClean: () => set({ isDirty: false, lastSavedAt: new Date() }),
-  
+
   stats: {
     pageCount: 1,
     wordCount: 0,
@@ -44,19 +37,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     characterNames: [],
     estimatedDuration: "~1 min",
   },
-  updateStats: () => {
-    const editor = get().editor
-    if (!editor) return
 
-    const text = editor.getText()
-    const wordCount = text.trim() === "" ? 0 : text.split(/\s+/).length
+  updateStatsFromFountain: (fountainText: string) => {
+    const trimmed = fountainText.trim()
+    const wordCount = trimmed === "" ? 0 : trimmed.split(/\s+/).length
 
     let sceneCount = 0
-    editor.state.doc.descendants((node) => {
-      if (node.type.name === "scene_heading") {
-        sceneCount++
-      }
-    })
+    try {
+      const ast = FountainParser.parse(fountainText)
+      sceneCount = ast.filter((e) => e.type === "scene_heading").length
+    } catch {
+      sceneCount = 0
+    }
 
     const pageCount = Math.max(1, Math.ceil(wordCount / 250))
     const minutes = Math.max(1, Math.round(wordCount / 250))
@@ -65,19 +57,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const estimatedDuration =
       hours > 0 ? `~${hours}h ${mins}m` : `~${mins} min`
 
-    set((state) => ({
+    set({
       stats: {
-        ...state.stats,
         wordCount,
         sceneCount,
         pageCount,
+        characterNames: [],
         estimatedDuration,
       },
-    }))
+    })
   },
-  
+
   zoom: 100,
   setZoom: (zoom) => set({ zoom }),
-  
+
   outline: [],
-}));
+}))
