@@ -56,10 +56,13 @@ export function ScreenplayBlockEditor({ disabled }: { disabled?: boolean }) {
 
   if (blocks.length === 0) {
     return (
-      <div className="px-4 py-12 text-center">
-        <p className="text-sm text-text-muted italic max-w-md mx-auto">
-          El guion aparecerá aquí en bloques editables cuando la IA genere contenido o
-          pegues texto Fountain. Usa el chat a la izquierda para instrucciones.
+      <div className="flex flex-col items-center justify-center flex-1 min-h-0 px-8 py-16 text-center select-none">
+        <div className="mb-4 text-4xl opacity-30">🎬</div>
+        <p className="text-base font-semibold text-text-muted mb-2">
+          Tu guion está vacío
+        </p>
+        <p className="text-sm text-text-muted opacity-70 max-w-sm leading-relaxed">
+          Escribe una instrucción en el panel izquierdo y presiona <span className="font-semibold">Generar</span> para que la IA construya tu guion, o escribe directo usando los botones de acción rápida.
         </p>
       </div>
     )
