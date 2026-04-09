@@ -49,7 +49,6 @@ export async function POST(request: Request, context: RouteContext) {
     const blob = PDFGenerator.generate(project.title, elements, {
       includeTitlePage: body.options?.includeTitlePage,
       includeSceneNumbers: body.options?.includeSceneNumbers,
-      includeNotes: body.options?.includeNotes,
       revision: body.options?.revision,
     })
     return new Response(blob, {
