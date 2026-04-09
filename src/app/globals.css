@@ -135,6 +135,10 @@
   --color-input: var(--accent-muted);
   --color-ring: var(--accent);
 
+  /* Popover / Select / Dropdown — fondo sólido para evitar transparencia */
+  --color-popover: var(--bg-secondary);
+  --color-popover-foreground: var(--text-primary);
+
   /* ===========================
      TYPOGRAPHY
      =========================== */
